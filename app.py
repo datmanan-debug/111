@@ -112,6 +112,11 @@ st.markdown("""
         border-radius: 6px;
         background-color: #FAFAF6;
     }
+
+    /* إخفاء الأزرار أو المربعات البرمجية الزائدة لضمان واجهة نظيفة جداً */
+    .hidden-element {
+        display: none !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -180,10 +185,13 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم دمج الزر بالـ HTML والـ JS ليصبح بالوسط المطلق 100% رغماً عن المنصة
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - نظيفة بالكامل وبدون أي مربعات علوية
     if st.session_state.page == 1:
-        # التقاط إشارة نقرة الزر المخفي في ستريمليت عبر الرابط البرمجي الخلفي للـ HTML
-        trigger_p1 = st.button("", key="hidden_p1_trigger", help=None)
+        # وضع الزر البرمجي الخفي لستريمليت في الأسفل وداخل حاوية مخفية تماماً لمنع ظهور أي مربع كحلي علوي
+        st.markdown("<div class='hidden-element'>", unsafe_allow_html=True)
+        trigger_p1 = st.button("", key="hidden_p1_trigger")
+        st.markdown("</div>", unsafe_allow_html=True)
+        
         if trigger_p1:
             next_page()
             st.rerun()
@@ -207,7 +215,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.write("")
         
-        # 🟢 بناء زر HTML وتوسيطه بالكامل مع ستايل المشروع وبدون تداخلات برمجية جانبية
+        # بناء زر الـ HTML الموسط تماماً 100% والمتناسق مع الهوية البصرية
         html_button = """
         <div style='width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 10px;'>
             <button id='click_p1_btn' style='
@@ -225,18 +233,11 @@ if menu_selection == "🔬 New AI Diagnostics":
             '>Next</button>
         </div>
         <script>
-            // ربط ضغطة زر الـ HTML الموسط بالزر البرمجي الخفي الخاص بستريمليت لتغيير الصفحة
             const btn = document.getElementById('click_p1_btn');
             btn.addEventListener('click', function() {
-                const streamlitButtons = window.parent.document.querySelectorAll('.stButton button');
-                for (let i = 0; i < streamlitButtons.length; i++) {
-                    if (streamlitButtons[i].innerText === "") {
-                        streamlitButtons[i].click();
-                        break;
-                    }
-                }
+                // تفعيل الزر المخفي بسلاسة للانتقال للصفحة التالية
+                window.parent.document.querySelector('.hidden-element button').click();
             });
-            // تأثير الهوفر المرن عند تمرير الماوس
             btn.onmouseover = function() { this.style.backgroundColor = '#D4A5B8'; this.style.color = '#2E4A62'; };
             btn.onmouseout = function() { this.style.backgroundColor = '#2E4A62'; this.style.color = 'white'; };
         </script>
