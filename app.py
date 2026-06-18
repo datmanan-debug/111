@@ -25,7 +25,7 @@ def get_image_base64(path):
 
 img_data = get_image_base64("m.jpg")
 
-# 2. إضافة حزمة CSS المخصصة للتحكم المطلق بموقع زر الصفحة الأولى وتجاور أزرار باقي الواجهات
+# 2. إضافة حزمة CSS المخصصة لتنسيق الألوان وتجاور الأزرار في الصفحات الداخلية
 st.markdown("""
     <style>
     /* تغيير الخلفية العامة إلى الخلفية العاجية الدافئة */
@@ -56,7 +56,7 @@ st.markdown("""
         width: 100%;
     }
 
-    /* التنسيق الأساسي للأزرار */
+    /* التنسيق الأساسي لأزرار ستريمليت في الصفحات الأخرى */
     div.stButton > button {
         background-color: #2E4A62 !important;
         color: white !important;
@@ -65,23 +65,6 @@ st.markdown("""
         border: none !important;
         font-weight: 600 !important;
         transition: all 0.3s ease;
-    }
-
-    /* 🟢 كود حديدي لفرض التوسط لزر الواجهة الأولى في المنتصف 100% وإزالة تأثير الـ Float اليمين */
-    .p1-btn-container {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
-        margin: 20px auto 0 auto !important;
-    }
-    .p1-btn-container div.stButton {
-        display: flex !important;
-        justify-content: center !important;
-        width: auto !important;
-    }
-    .p1-btn-container div.stButton > button {
-        width: 160px !important;
     }
 
     /* جعل أزرار باقي الواجهات تملأ الأعمدة المتقاربة بشكل متناسق */
@@ -197,8 +180,14 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم إجبار الزر على البقاء في السنتر المطلق عبر حاوية Flex المحدثة
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم دمج الزر بالـ HTML والـ JS ليصبح بالوسط المطلق 100% رغماً عن المنصة
     if st.session_state.page == 1:
+        # التقاط إشارة نقرة الزر المخفي في ستريمليت عبر الرابط البرمجي الخلفي للـ HTML
+        trigger_p1 = st.button("", key="hidden_p1_trigger", help=None)
+        if trigger_p1:
+            next_page()
+            st.rerun()
+
         st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
         if img_data:
             logo_html = f"""
@@ -218,10 +207,41 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.write("")
         
-        # 🟢 الحاوية المحدثة لفرض السنتر 100% وإلغاء إنحياز اليمين للزر الافتراضي لستريمليت
-        st.markdown("<div class='p1-btn-container'>", unsafe_allow_html=True)
-        st.button("Next", on_click=next_page, key="btn_p1_next")
-        st.markdown("</div>", unsafe_allow_html=True)
+        # 🟢 بناء زر HTML وتوسيطه بالكامل مع ستايل المشروع وبدون تداخلات برمجية جانبية
+        html_button = """
+        <div style='width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 10px;'>
+            <button id='click_p1_btn' style='
+                background-color: #2E4A62;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 10px 45px;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                width: 160px;
+                box-sizing: border-box;
+            '>Next</button>
+        </div>
+        <script>
+            // ربط ضغطة زر الـ HTML الموسط بالزر البرمجي الخفي الخاص بستريمليت لتغيير الصفحة
+            const btn = document.getElementById('click_p1_btn');
+            btn.addEventListener('click', function() {
+                const streamlitButtons = window.parent.document.querySelectorAll('.stButton button');
+                for (let i = 0; i < streamlitButtons.length; i++) {
+                    if (streamlitButtons[i].innerText === "") {
+                        streamlitButtons[i].click();
+                        break;
+                    }
+                }
+            });
+            // تأثير الهوفر المرن عند تمرير الماوس
+            btn.onmouseover = function() { this.style.backgroundColor = '#D4A5B8'; this.style.color = '#2E4A62'; };
+            btn.onmouseout = function() { this.style.backgroundColor = '#2E4A62'; this.style.color = 'white'; };
+        </script>
+        """
+        st.components.v1.html(html_button, height=60)
         st.markdown("</div>", unsafe_allow_html=True)
 
     # الواجهة 2: بيانات المريض الطبية (Patient Info) - أزرار متقاربة ومتوسطة الشاشة
