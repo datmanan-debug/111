@@ -2,14 +2,19 @@ import streamlit as st
 import time
 import os
 import base64
+import pandas as pd
+from datetime import datetime
 
 # 1. إعدادات الصفحة الأساسية والثيم الرسمي
 st.set_page_config(
     page_title="Mammogram AI Diagnostics",
     page_icon="🧬",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded" # جعل الشاشة الجانبية تفتح تلقائياً لتوضيح الخيارات
 )
+
+# مسار ملف حفظ البيانات (الإكسل)
+LOG_FILE = "patients_log.csv"
 
 # دالة لقراءة الصورة وتحويلها لـ Base64 لضمان عمل الـ CSS عليها بدقة
 def get_image_base64(path):
@@ -82,203 +87,272 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. إدارة التنقل بين الصفحات الخمس باستخدام Session State
+# 3. إدارة التنقل والبيانات باستخدام Session State
 if 'page' not in st.session_state:
     st.session_state.page = 1
 
-if 'patient_name' not in st.session_state:
-    st.session_state.patient_name = ""
+# تهيئة بيانات المريض الافتراضية لضمان الحفظ الصحيح
+if 'patient_name' not in st.session_state: st.session_state.patient_name = ""
+if 'patient_age' not in st.session_state: st.session_state.patient_age = "45"
+if 'patient_phone' not in st.session_state: st.session_state.patient_phone = ""
+if 'patient_history' not in st.session_state: st.session_state.patient_history = "No"
 
-# دالات المساعدة للتنقل وحل مشكلة القفز التلقائي
-def next_page(): 
-    st.session_state.page += 1
+# دالات المساعدة للتنقل
+def next_page(): st.session_state.page += 1
+def prev_page(): st.session_state.page -= 1
 
-def prev_page(): 
-    st.session_state.page -= 1
-
-def reset_system():
+# دالة حفظ البيانات في ملف الـ CSV وتصفير النظام للعودة للواجهة الأولى
+def save_and_reset():
+    # 1. تجهيز البيانات الجديدة للحفظ
+    new_record = {
+        "Date & Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Patient Name": st.session_state.patient_name if st.session_state.patient_name else "Anonymous",
+        "Age": st.session_state.patient_age,
+        "Phone": st.session_state.patient_phone if st.session_state.patient_phone else "N/A",
+        "History of Pathology": st.session_state.patient_history,
+        "AI Diagnostics Result": "Malignant (87.6%)" # النتيجة النهائية الثابتة بالواجهة 5
+    }
+    
+    # 2. تحويل السجل الحالي إلى DataFrame
+    df_new = pd.DataFrame([new_record])
+    
+    # 3. الحفظ المباشر في ملف الـ CSV (إنشاء ملف جديد أو الإضافة على القديم)
+    if os.path.exists(LOG_FILE):
+        df_old = pd.read_csv(LOG_FILE)
+        df_combined = pd.concat([df_old, df_new], ignore_index=True)
+        df_combined.to_csv(LOG_FILE, index=False)
+    else:
+        df_new.to_csv(LOG_FILE, index=False)
+        
+    # 4. تصفير المدخلات للعودة للحالة الأولى بنجاح
     st.session_state.page = 1
     st.session_state.patient_name = ""
+    st.session_state.patient_age = "45"
+    st.session_state.patient_phone = ""
+    st.session_state.patient_history = "No"
 
 # ==========================================
-# الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
+# بناء القائمة الجانبية (Sidebar Navigation)
 # ==========================================
-if st.session_state.page == 1:
+with st.sidebar:
+    st.markdown("<h2 style='text-align: left; font-size: 1.5rem; margin-bottom: 20px;'>⚙️ Control Panel</h2>", unsafe_allow_html=True)
+    menu_selection = st.radio(
+        "Navigate System Modules:",
+        ["🔬 New AI Diagnostics", "📋 Patients Medical Log"]
+    )
+    st.markdown("---")
+    st.markdown("<small style='color: #718096;'>System Status: <b>Online</b><br>Database: <b>Local CSV</b></small>", unsafe_allow_html=True)
+
+# ==========================================
+# القسم الأول: نظام الفحص (5 واجهات تتابعية)
+# ==========================================
+if menu_selection == "🔬 New AI Diagnostics":
+
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
+    if st.session_state.page == 1:
+        st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
+        if img_data:
+            logo_html = f"""
+            <div style='display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;'>
+                <h2 style='color: #1A365D !important; font-size: 2rem; margin: 0; letter-spacing: 2px;'>ENGINEERING TITANS</h2>
+                <img src='data:image/jpeg;base64,{img_data}' style='height: 60px; width: auto; object-fit: contain; mix-blend-mode: multiply;'>
+            </div>
+            """
+        else:
+            logo_html = "<h2 style='color: #1A365D !important; font-size: 2rem; margin-bottom: 20px; letter-spacing: 2px;'>ENGINEERING TITANS</h2>"
+            
+        st.markdown(logo_html, unsafe_allow_html=True)
+        st.title("Mammogram AI Diagnostics System")
+        st.markdown("<p style='color: #4A5568; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
+        st.write("")
+        st.write("")
+        
+        col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
+        with col_btn_mid:
+            st.button("Next", on_click=next_page, key="btn_p1_next")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # الواجهة 2: بيانات المريض الطبية (Patient Info)
+    elif st.session_state.page == 2:
+        st.markdown("<h2 style='text-align: left;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
+        st.markdown("Please enter the patient's records accurately to map with the DICOM metadata.")
+        st.write("")
+        
+        st.session_state.patient_name = st.text_input("Patient Full Name", value=st.session_state.patient_name)
+        
+        col_age, col_phone = st.columns(2)
+        with col_age:
+            st.session_state.patient_age = st.text_input("Patient Age", value=st.session_state.patient_age)
+        with col_phone:
+            st.session_state.patient_phone = st.text_input("Contact Number", value=st.session_state.patient_phone)
+            
+        st.session_state.patient_history = st.radio("Prior Medical History of Breast Pathology?", ["No", "Yes"], index=0 if st.session_state.patient_history == "No" else 1)
+        
+        st.write("")
+        st.write("")
+        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        
+        col_back, col_next = st.columns([1, 1])
+        with col_back:
+            st.button("Back", on_click=prev_page, key="btn_p2_back")
+        with col_next:
+            st.button("Next", on_click=next_page, key="btn_p2_next")
+
+    # الواجهة 3: رفع ملف الـ DICOM (Upload File)
+    elif st.session_state.page == 3:
+        st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
+        st.write("")
+        st.markdown("<span class='ai-badge'>Supports standard .dcm / .dicom formats</span>", unsafe_allow_html=True)
+        
+        uploaded_file = st.file_uploader("Upload Digital Mammography (DICOM File)", type=["dcm", "dicom"])
+        st.markdown("""
+            <div style='margin-top: 5px; margin-bottom: 20px; font-size: 0.85rem; color: #718096;'>
+                ⚠️ Max file size: 200MB. Data is encrypted and processed locally ensuring HIPAA compliance.
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if uploaded_file is not None:
+            with st.spinner("AI Engine running inference... Processing pixel arrays and neural layers."):
+                time.sleep(1.5) 
+            st.success("Analysis complete. Ready to view results.")
+            
+        st.write("")
+        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        
+        col_back, col_next = st.columns([1, 1])
+        with col_back:
+            st.button("Back", on_click=prev_page, key="btn_p3_back")
+        with col_next:
+            st.button("Next", on_click=next_page, key="btn_p3_next")
+
+    # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
+    elif st.session_state.page == 4:
+        st.markdown("<h2 style='text-align: left;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
+        st.write("")
+        col_res1, col_res2 = st.columns(2)
+        with col_res1:
+            st.markdown("""
+                <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.6;'>
+                    <h3 style='color: #718096 !important; margin: 0; text-align: center;'>NORMAL</h3>
+                    <p style='color: #A0AEC0; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --</p>
+                </div>
+            """, unsafe_allow_html=True)
+        with col_res2:
+            st.markdown("""
+                <div style='border: 2px solid #9B2C2C; padding: 20px; border-radius: 6px; background-color: #FFF5F5;'>
+                    <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
+                    <p style='color: #C53030; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: 94.2%</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        st.markdown("""
+            <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>
+                💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.write("")
+        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        col_back, col_next = st.columns([1, 1])
+        with col_back:
+            st.button("Back", on_click=prev_page, key="btn_p4_back")
+        with col_next:
+            st.button("Next", on_click=next_page, key="btn_p4_next")
+
+    # الواجهة 5: تفصيل النتيجة وحفظ السجل التلقائي عند الضغط على Next
+    elif st.session_state.page == 5:
+        st.markdown("<h2 style='text-align: left;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
+        st.write("")
+        st.markdown("""
+            <div style='background-color: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
+                <span style='color: #9B2C2C; font-weight: bold;'>Initial Status: ABNORMAL DETECTED</span>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        col_b, col_m = st.columns(2)
+        with col_b:
+            st.markdown("""
+                <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.5;'>
+                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>BENIGN</h3>
+                    <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: 12.4%</p>
+                </div>
+            """, unsafe_allow_html=True)
+        with col_m:
+            st.markdown("""
+                <div style='border: 2px solid #9B2C2C; padding: 25px; border-radius: 6px; background-color: #FFF5F5; box-shadow: 0 4px 10px rgba(155, 44, 44, 0.1);'>
+                    <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>MALIGNANT</h3>
+                    <p style='color: #E53E3E; font-weight: bold; font-size: 1.1rem; margin-top: 5px; text-align: center;'>Probability: 87.6%</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        st.markdown("""
+            <div style='text-align: left; margin-top: 25px; border-left: 4px solid #1A365D; padding-left: 15px; font-size: 0.85rem; color: #4A5568;'>
+                <b>Engineering Titans System Note:</b> This evaluation is generated by an automated Deep Learning ensemble model. Results must be correlated clinically via histopathological biopsy before finalizing oncology reports.
+            </div>
+        """, unsafe_allow_html=True)
+        
+        st.write("")
+        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        
+        col_back, col_next = st.columns([1, 1])
+        with col_back:
+            st.button("Back", on_click=prev_page, key="btn_p5_back")
+        with col_next:
+            # هنا يتم استدعاء دالة الحفظ الذكي والعودة للواجهة الأولى بربط آمن
+            st.button("Next", on_click=save_and_reset, key="btn_p5_next")
+
+# ==========================================
+# القسم الثاني: السجل الطبي للمرضى (Medical Log Page)
+# ==========================================
+elif menu_selection == "📋 Patients Medical Log":
+    st.markdown("<h2 style='text-align: left;'>📋 Patients Diagnostic Log Database</h2>", unsafe_allow_html=True)
+    st.markdown("Review, search, and export historical diagnostic sessions saved on the system.")
+    st.write("")
     
-    st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
-    
-    if img_data:
-        logo_html = f"""
-        <div style='display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;'>
-            <h2 style='color: #1A365D !important; font-size: 2rem; margin: 0; letter-spacing: 2px;'>ENGINEERING TITANS</h2>
-            <img src='data:image/jpeg;base64,{img_data}' style='height: 60px; width: auto; object-fit: contain; mix-blend-mode: multiply;'>
-        </div>
-        """
+    if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > 0:
+        # قراءة البيانات المحفوظة
+        df_log = pd.read_csv(LOG_FILE)
+        
+        # 1. شريط البحث السريع
+        search_query = st.text_input("🔍 Search Database (By Name, Phone or Result):", "")
+        
+        if search_query:
+            filtered_df = df_log[
+                df_log['Patient Name'].astype(str).str.contains(search_query, case=False, na=False) |
+                df_log['Phone'].astype(str).str.contains(search_query, case=False, na=False) |
+                df_log['AI Diagnostics Result'].astype(str).str.contains(search_query, case=False, na=False)
+            ]
+        else:
+            filtered_df = df_log
+
+        # Reverse لكي تظهر آخر حالة تم إضافتها في أعلى الجدول
+        filtered_df = filtered_df.iloc[::-1]
+        
+        # 2. عرض الجدول بطريقة ستريمليت التفاعلية الأنيقة
+        st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+        
+        st.write("")
+        
+        # 3. أدوات التحكم (تحميل الإكسل وتصفير السجل)
+        col_dl, col_clr = st.columns([2, 1])
+        with col_dl:
+            # دالة لتحويل الـ dataframe إلى CSV جاهز للتحميل بلمسة واحدة
+            csv_data = df_log.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Export Full Log to Excel (.CSV)",
+                data=csv_data,
+                file_name=f"Mammogram_AI_Log_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime='text/csv'
+            )
+        with col_clr:
+            if st.button("🗑️ Clear Database"):
+                os.remove(LOG_FILE)
+                st.success("Database cleared successfully.")
+                st.rerun()
     else:
-        logo_html = "<h2 style='color: #1A365D !important; font-size: 2rem; margin-bottom: 20px; letter-spacing: 2px;'>ENGINEERING TITANS</h2>"
-        
-    st.markdown(logo_html, unsafe_allow_html=True)
-    
-    st.title("Mammogram AI Diagnostics System")
-    st.markdown("<p style='color: #4A5568; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
-    
-    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
-    
-    st.write("")
-    st.write("")
-    
-    col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
-    with col_btn_mid:
-        st.button("Next", on_click=next_page, key="btn_p1_next")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ==========================================
-# الواجهة 2: بيانات المريض الطبية (Patient Info)
-# ==========================================
-elif st.session_state.page == 2:
-    st.markdown("<h2 style='text-align: left;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
-    st.markdown("Please enter the patient's records accurately to map with the DICOM metadata.")
-    st.write("")
-    
-    name = st.text_input("Patient Full Name", value=st.session_state.patient_name)
-    st.session_state.patient_name = name
-    
-    col_age, col_phone = st.columns(2)
-    with col_age:
-        st.text_input("Patient Age", value="45")
-    with col_phone:
-        st.text_input("Contact Number")
-        
-    st.radio("Prior Medical History of Breast Pathology?", ["No", "Yes"])
-    
-    st.write("")
-    st.write("")
-    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
-    
-    col_back, col_next = st.columns([1, 1])
-    with col_back:
-        st.button("Back", on_click=prev_page, key="btn_p2_back")
-    with col_next:
-        st.button("Next", on_click=next_page, key="btn_p2_next")
-
-# ==========================================
-# الواجهة 3: رفع ملف الـ DICOM (Upload File)
-# ==========================================
-elif st.session_state.page == 3:
-    st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
-    st.write("")
-    
-    st.markdown("<span class='ai-badge'>Supports standard .dcm / .dicom formats</span>", unsafe_allow_html=True)
-    
-    uploaded_file = st.file_uploader("Upload Digital Mammography (DICOM File)", type=["dcm", "dicom"])
-    
-    st.markdown("""
-        <div style='margin-top: 5px; margin-bottom: 20px; font-size: 0.85rem; color: #718096;'>
-            ⚠️ Max file size: 200MB. Data is encrypted and processed locally ensuring HIPAA compliance.
-        </div>
-    """, unsafe_allow_html=True)
-    
-    if uploaded_file is not None:
-        with st.spinner("AI Engine running inference... Processing pixel arrays and neural layers."):
-            time.sleep(1.5) 
-        st.success("Analysis complete. Ready to view results.")
-        
-    st.write("")
-    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
-    
-    col_back, col_next = st.columns([1, 1])
-    with col_back:
-        st.button("Back", on_click=prev_page, key="btn_p3_back")
-    with col_next:
-        st.button("Next", on_click=next_page, key="btn_p3_next")
-
-# ==========================================
-# الواجهة 4: النتيجة الأولية (Normal / Abnormal)
-# ==========================================
-elif st.session_state.page == 4:
-    st.markdown("<h2 style='text-align: left;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
-    st.write("")
-    
-    col_res1, col_res2 = st.columns(2)
-    
-    with col_res1:
-        st.markdown("""
-            <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.6;'>
-                <h3 style='color: #718096 !important; margin: 0; text-align: center;'>NORMAL</h3>
-                <p style='color: #A0AEC0; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-    with col_res2:
-        st.markdown("""
-            <div style='border: 2px solid #9B2C2C; padding: 20px; border-radius: 6px; background-color: #FFF5F5;'>
-                <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
-                <p style='color: #C53030; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: 94.2%</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-    st.markdown("""
-        <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>
-            💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.write("")
-    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
-    
-    col_back, col_next = st.columns([1, 1])
-    with col_back:
-        st.button("Back", on_click=prev_page, key="btn_p4_back")
-    with col_next:
-        st.button("Next", on_click=next_page, key="btn_p4_next")
-
-# ==========================================
-# الواجهة 5: تفصيل النتيجة (Benign / Malignant)
-# ==========================================
-elif st.session_state.page == 5:
-    st.markdown("<h2 style='text-align: left;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
-    st.write("")
-    
-    st.markdown("""
-        <div style='background-color: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
-            <span style='color: #9B2C2C; font-weight: bold;'>Initial Status: ABNORMAL DETECTED</span>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col_b, col_m = st.columns(2)
-    
-    with col_b:
-        st.markdown("""
-            <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.5;'>
-                <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>BENIGN</h3>
-                <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: 12.4%</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-    with col_m:
-        st.markdown("""
-            <div style='border: 2px solid #9B2C2C; padding: 25px; border-radius: 6px; background-color: #FFF5F5; box-shadow: 0 4px 10px rgba(155, 44, 44, 0.1);'>
-                <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>MALIGNANT</h3>
-                <p style='color: #E53E3E; font-weight: bold; font-size: 1.1rem; margin-top: 5px; text-align: center;'>Probability: 87.6%</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-    st.markdown("""
-        <div style='text-align: left; margin-top: 25px; border-left: 4px solid #1A365D; padding-left: 15px; font-size: 0.85rem; color: #4A5568;'>
-            <b>Engineering Titans System Note:</b> This evaluation is generated by an automated Deep Learning ensemble model. Results must be correlated clinically via histopathological biopsy before finalizing oncology reports.
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.write("")
-    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
-    
-    col_back, col_next = st.columns([1, 1])
-    with col_back:
-        st.button("Back", on_click=prev_page, key="btn_p5_back")
-    with col_next:
-        # ربط دالة التصفير مباشرة لحل مشكلة التنقل المفاجئ
-        st.button("Next", on_click=reset_system, key="btn_p5_next")
+        # في حال عدم وجود سجلات مسبقة
+        st.info("No records found in the database. Complete an AI Diagnostic session to populate the log table.")
 
 # 4. تذييل الصفحة الرسمي الثابت (Footer)
 st.markdown("""
