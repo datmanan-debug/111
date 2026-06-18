@@ -10,7 +10,7 @@ st.set_page_config(
     page_title="Mammogram AI Diagnostics",
     page_icon="🧬",
     layout="centered",
-    initial_sidebar_state="expanded" # جعل الشاشة الجانبية تفتح تلقائياً لتوضيح الخيارات
+    initial_sidebar_state="expanded"
 )
 
 # مسار ملف حفظ البيانات (الإكسل)
@@ -103,20 +103,22 @@ def prev_page(): st.session_state.page -= 1
 
 # دالة حفظ البيانات في ملف الـ CSV وتصفير النظام للعودة للواجهة الأولى
 def save_and_reset():
-    # 1. تجهيز البيانات الجديدة للحفظ
+    now = datetime.now()
+    # 1. تجهيز البيانات الجديدة للحفظ مع فصل التاريخ عن الوقت
     new_record = {
-        "Date & Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Date": now.strftime("%Y-%m-%d"),
+        "Time": now.strftime("%H:%M:%S"),
         "Patient Name": st.session_state.patient_name if st.session_state.patient_name else "Anonymous",
         "Age": st.session_state.patient_age,
         "Phone": st.session_state.patient_phone if st.session_state.patient_phone else "N/A",
         "History of Pathology": st.session_state.patient_history,
-        "AI Diagnostics Result": "Malignant (87.6%)" # النتيجة النهائية الثابتة بالواجهة 5
+        "AI Diagnostics Result": "Malignant (87.6%)"
     }
     
     # 2. تحويل السجل الحالي إلى DataFrame
     df_new = pd.DataFrame([new_record])
     
-    # 3. الحفظ المباشر في ملف الـ CSV (إنشاء ملف جديد أو الإضافة على القديم)
+    # 3. الحفظ المباشر في ملف الـ CSV
     if os.path.exists(LOG_FILE):
         df_old = pd.read_csv(LOG_FILE)
         df_combined = pd.concat([df_old, df_new], ignore_index=True)
@@ -260,7 +262,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p4_next")
 
-    # الواجهة 5: تفصيل النتيجة وحفظ السجل التلقائي عند الضغط على Next
+    # الواجهة 5: تفصيل النتيجة وحفظ السجل
     elif st.session_state.page == 5:
         st.markdown("<h2 style='text-align: left;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
         st.write("")
@@ -299,11 +301,10 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p5_back")
         with col_next:
-            # هنا يتم استدعاء دالة الحفظ الذكي والعودة للواجهة الأولى بربط آمن
             st.button("Next", on_click=save_and_reset, key="btn_p5_next")
 
 # ==========================================
-# القسم الثاني: السجل الطبي للمرضى (Medical Log Page)
+# القسم الثاني: السجل الطبي للمرضى (الجدول المحدث بالفصل)
 # ==========================================
 elif menu_selection == "📋 Patients Medical Log":
     st.markdown("<h2 style='text-align: left;'>📋 Patients Diagnostic Log Database</h2>", unsafe_allow_html=True)
@@ -311,10 +312,9 @@ elif menu_selection == "📋 Patients Medical Log":
     st.write("")
     
     if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > 0:
-        # قراءة البيانات المحفوظة
         df_log = pd.read_csv(LOG_FILE)
         
-        # 1. شريط البحث السريع
+        # شريط البحث
         search_query = st.text_input("🔍 Search Database (By Name, Phone or Result):", "")
         
         if search_query:
@@ -326,18 +326,16 @@ elif menu_selection == "📋 Patients Medical Log":
         else:
             filtered_df = df_log
 
-        # Reverse لكي تظهر آخر حالة تم إضافتها في أعلى الجدول
+        # قلب الجدول لعرض الأحدث دائماً في البداية
         filtered_df = filtered_df.iloc[::-1]
         
-        # 2. عرض الجدول بطريقة ستريمليت التفاعلية الأنيقة
+        # عرض الجدول التفاعلي المفصل (Date و Time بشكل منفصل)
         st.dataframe(filtered_df, use_container_width=True, hide_index=True)
         
         st.write("")
         
-        # 3. أدوات التحكم (تحميل الإكسل وتصفير السجل)
         col_dl, col_clr = st.columns([2, 1])
         with col_dl:
-            # دالة لتحويل الـ dataframe إلى CSV جاهز للتحميل بلمسة واحدة
             csv_data = df_log.to_csv(index=False).encode('utf-8')
             st.download_button(
                 label="📥 Export Full Log to Excel (.CSV)",
@@ -351,7 +349,6 @@ elif menu_selection == "📋 Patients Medical Log":
                 st.success("Database cleared successfully.")
                 st.rerun()
     else:
-        # في حال عدم وجود سجلات مسبقة
         st.info("No records found in the database. Complete an AI Diagnostic session to populate the log table.")
 
 # 4. تذييل الصفحة الرسمي الثابت (Footer)
