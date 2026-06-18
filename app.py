@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import os
 
 # 1. إعدادات الصفحة الأساسية والثيم الرسمي
 st.set_page_config(
@@ -22,6 +23,7 @@ st.markdown("""
         color: #1A365D !important;
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 700;
+        text-align: center;
     }
     
     /* تنسيق الحاويات والمربعات لتظهر بشكل كلاسيكي هادئ */
@@ -63,18 +65,13 @@ st.markdown("""
         border: 1px solid #BEE3F8;
     }
 
-    /* تنسيق ملصق الشعار في المنتصف */
-    .logo-sticker {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        border: 2px solid #1A365D;
+    /* ملصق الشعار الخلفي الكحلي */
+    .sticker-container {
+        background-color: #1A365D;
         padding: 12px 25px;
         border-radius: 12px;
-        background-color: #1A365D;
-        color: white;
         box-shadow: 0 4px 10px rgba(26, 54, 93, 0.2);
+        margin-bottom: 25px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -94,28 +91,41 @@ def prev_page(): st.session_state.page -= 1
 # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
 # ==========================================
 if st.session_state.page == 1:
-    st.markdown("<div style='text-align: center; margin-top: 50px;'>", unsafe_allow_html=True)
+    st.write("") # مساحة علوية
+    st.write("")
     
-    # حاوية ملصق الشعار (النص والصورة بجانبه بالمنتصف تماماً)
-    st.markdown("""
-        <div style='display: flex; justify-content: center; align-items: center; margin-bottom: 25px;'>
-            <div class='logo-sticker'>
-                <span style='font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;'>ENGINEERING TITANS</span>
-                <img src='app/static/m.jpg' style='height: 40px; border-radius: 4px; object-fit: cover;'>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    # خدعة الأعمدة من ستريمليت لتوسيط الملصق (النص والصورة بجانبه) بنسبة 100%
+    col_left, col_sticker, col_right = st.columns([1, 4, 1])
     
+    with col_sticker:
+        # هنا دمجنا الـ HTML لعمل الخلفية الكحلية مع دوال ستريمليت الأصلية لعرض الصورة بضمان
+        st.markdown("<div class='sticker-container'>", unsafe_allow_html=True)
+        
+        # عمود للنص وعمود للصورة داخل الملصق
+        c1, c2 = st.columns([3, 1])
+        with c1:
+            st.markdown("<h2 style='color: white !important; font-size: 1.5rem; margin-top: 5px; letter-spacing: 2px; text-align: center;'>ENGINEERING TITANS</h2>", unsafe_allow_html=True)
+        with c2:
+            if os.path.exists("m.jpg"):
+                st.image("m.jpg", width=45)
+            else:
+                st.markdown("<span style='color:red;'>Missing m.jpg</span>", unsafe_allow_html=True)
+                
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    # العناوين الرئيسية بالمنتصف تماماً
     st.title("Mammogram AI Diagnostics System")
-    st.markdown("<p style='color: #4A5568; font-size: 1.1rem;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #4A5568; font-size: 1.1rem; text-align: center;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
     st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 30px auto;'>", unsafe_allow_html=True)
     
+    # مسافة إضافية لنزول زر الـ Next ليجوه
     st.write("")
     st.write("")
+    st.write("")
+    
     col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
         st.button("Proceed to Clinical Portal", on_click=next_page)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # الواجهة 2: بيانات المريض الطبية (Patient Info)
