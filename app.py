@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import time
 
 # 1. إعدادات الصفحة الأساسية والثيم الرسمي
@@ -50,11 +50,6 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
-    /* زر التراجع بلون محايد */
-    div[data-testid="stMarkdownContainer"] + div {
-        margin-top: 10px;
-    }
-    
     /* تأثير الباركود الرقمي أو لمسة الذكاء الاصطناعي */
     .ai-badge {
         background-color: #EBF8FF;
@@ -67,8 +62,22 @@ st.markdown("""
         margin-bottom: 15px;
         border: 1px solid #BEE3F8;
     }
+
+    /* تنسيق ملصق الشعار في المنتصف */
+    .logo-sticker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        border: 2px solid #1A365D;
+        padding: 12px 25px;
+        border-radius: 12px;
+        background-color: #1A365D;
+        color: white;
+        box-shadow: 0 4px 10px rgba(26, 54, 93, 0.2);
+    }
     </style>
-""", unsafe_allow_error=True)
+""", unsafe_allow_html=True)
 
 # 3. إدارة التنقل بين الصفحات الخمس باستخدام Session State
 if 'page' not in st.session_state:
@@ -87,32 +96,27 @@ def prev_page(): st.session_state.page -= 1
 if st.session_state.page == 1:
     st.markdown("<div style='text-align: center; margin-top: 50px;'>", unsafe_allow_html=True)
     
-    # محاكاة مكان اللوغو بنص رسمي منسق
+    # حاوية ملصق الشعار (النص والصورة بجانبه بالمنتصف تماماً)
     st.markdown("""
-        <div style='border: 2px solid #1A365D; display: inline-block; padding: 15px 30px; border-radius: 6px; margin-bottom: 20px; background-color: #1A365D; color: white;'>
-            <span style='font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;'>ENGINEERING TITANS</span>
+        <div style='display: flex; justify-content: center; align-items: center; margin-bottom: 25px;'>
+            <div class='logo-sticker'>
+                <span style='font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;'>ENGINEERING TITANS</span>
+                <img src='app/static/m.jpg' style='height: 40px; border-radius: 4px; object-fit: cover;'>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
     st.title("Mammogram AI Diagnostics System")
     st.markdown("<p style='color: #4A5568; font-size: 1.1rem;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
-    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 20px auto;'>", unsafe_allow_html=True)
-    
-    st.markdown("""
-        <div class='custom-card' style='max-width: 500px; margin: 0 auto; text-align: left;'>
-            <span class='ai-badge'>System Status: Ready</span>
-            <p style='color: #718096; font-size: 0.9rem; line-height: 1.6;'>
-                This clinical-grade software utilizes deep learning architectures to assist medical professionals in mammogram screening and early breast cancer classification.
-            </p>
-            <p style='font-size: 0.8rem; color: #A0AEC0;'>Version 1.0.0 • Verified Deployment</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 30px auto;'>", unsafe_allow_html=True)
     
     st.write("")
-    col1, col2, col3 = st.columns([1, 2, 1])
+    st.write("")
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
         st.button("Proceed to Clinical Portal", on_click=next_page)
     st.markdown("</div>", unsafe_allow_html=True)
+
 # ==========================================
 # الواجهة 2: بيانات المريض الطبية (Patient Info)
 # ==========================================
@@ -160,29 +164,29 @@ elif st.session_state.page == 3:
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
     
-    # إضافة لمسة محاكاة الذكاء الاصطناعي (AI Scanning Process) عند الرفع
-    if uploaded_file is not My_Upload_Object := None:
+    file_ready = False
+    if uploaded_file is not None:
+        file_ready = True
         with st.spinner("AI Engine running inference... Processing pixel arrays and neural layers."):
-            time.sleep(2) # محاكاة وقت التحليل
+            time.sleep(1.5) 
         st.success("Analysis complete. Ready to view results.")
         
     col_back, col_next = st.columns([1, 1])
     with col_back:
         st.button("← Back", on_click=prev_page)
     with col_next:
-        st.button("Run AI Diagnostics →", on_click=next_page)
+        st.button("Run AI Diagnostics →", on_click=next_page, disabled=not file_ready)
 
 # ==========================================
 # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
 # ==========================================
 elif st.session_state.page == 4:
     st.subheader("🔬 AI Diagnostic Analysis Result")
-    st.markdown(f"Analysis for Patient: **{st.session_state.patient_name}**")
+    st.markdown(f"Analysis for Patient: **{st.session_state.patient_name if st.session_state.patient_name else 'Anonymous'}**")
     
     st.markdown("<div class='custom-card' style='text-align: center;'>", unsafe_allow_html=True)
     st.markdown("<span class='ai-badge'>Classification Layer: Binary Screening</span>", unsafe_allow_html=True)
     
-    # عرض النتائج بشكل رسمي مع الـ Confidence Score كما اقترح المشرف
     col_res1, col_res2 = st.columns(2)
     
     with col_res1:
@@ -194,7 +198,6 @@ elif st.session_state.page == 4:
         """, unsafe_allow_html=True)
         
     with col_res2:
-        # جعل الخيار النشط يبرز بلون واضح ورسمي (مثل الوردي الطبي الغامق أو الأحمر الهادئ للتحذير)
         st.markdown("""
             <div style='border: 2px solid #9B2C2C; padding: 20px; border-radius: 6px; background-color: #FFF5F5;'>
                 <h3 style='color: #9B2C2C !important; margin: 0;'>ABNORMAL FINDINGS</h3>
@@ -203,8 +206,7 @@ elif st.session_state.page == 4:
         """, unsafe_allow_html=True)
         
     st.markdown("""
-        <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>
-            💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
+        <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
         </div>
     """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
