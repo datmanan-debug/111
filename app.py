@@ -56,17 +56,29 @@ st.markdown("""
         width: 100%;
     }
 
-    /* تنسيق مخصص للأزرار باللون الأزرق البترولي */
+    /* تنسيق مخصص للأزرار باللون الأزرق البترولي والتوسط الحقيقي */
     div.stButton > button {
-        width: 100% !important;
         background-color: #2E4A62 !important;
         color: white !important;
         border-radius: 6px !important;
-        padding: 10px 20px !important;
+        padding: 10px 25px !important;
         border: none !important;
         font-weight: 600 !important;
         transition: all 0.3s ease;
+        display: block !important;
+        margin: 0 auto !important; /* فرض التوسط داخل الحاويات */
     }
+    
+    /* جعل أزرار الواجهة الأولى بوزن مناسب ومحاذاة في السنتر */
+    .p1-btn-container div.stButton > button {
+        width: 150px !important;
+    }
+
+    /* جعل أزرار باقي الواجهات تملأ الأعمدة المتقاربة بشكل متناسق */
+    .inner-pages-buttons div.stButton > button {
+        width: 100% !important;
+    }
+
     div.stButton > button:hover {
         background-color: #D4A5B8 !important;
         color: #2E4A62 !important;
@@ -175,7 +187,7 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - زر Next في المنتصف تماماً وبشكل مستقل
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم ضبط الزر في السنتر المطلق 100% بدون Columns
     if st.session_state.page == 1:
         st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
         if img_data:
@@ -196,10 +208,10 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.write("")
         
-        # تقسيم مخصص لجعل زر الـ Next في السنتر تماماً
-        col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
-        with col_btn_mid:
-            st.button("Next", on_click=next_page, key="btn_p1_next")
+        # حاوية مخصصة لفرض توسيط زر الواجهة الأولى منعاً للانحراف الطبيعي لليسار
+        st.markdown("<div class='p1-btn-container' style='width: 100%; text-align: center;'>", unsafe_allow_html=True)
+        st.button("Next", on_click=next_page, key="btn_p1_next")
+        st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     # الواجهة 2: بيانات المريض الطبية (Patient Info) - أزرار متقاربة ومتوسطة الشاشة
@@ -221,12 +233,14 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        # أزرار متقاربة في منتصف الواجهة
+        # أزرار متقاربة ومتوسطة
+        st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p2_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p2_next")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # الواجهة 3: رفع ملف الـ DICOM (Upload File) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 3:
@@ -249,12 +263,14 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        # أزرار متقاربة في منتصف الواجهة
+        # أزرار متقاربة ومتوسطة
+        st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p3_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p3_next")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # الواجهة 4: النتيجة الأولية (Normal / Abnormal) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 4:
@@ -286,12 +302,14 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        # أزرار متقاربة في منتصف الواجهة
+        # أزرار متقاربة ومتوسطة
+        st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p4_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p4_next")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # الواجهة 5: تفصيل النتيجة (Benign / Malignant) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 5:
@@ -328,12 +346,14 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        # أزرار متقاربة في منتصف الواجهة
+        # أزرار متقاربة ومتوسطة
+        st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p5_back")
         with col_next:
             st.button("Next", on_click=save_and_reset, key="btn_p5_next")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # القسم الثاني: السجل الطبي للمرضى
