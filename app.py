@@ -25,7 +25,7 @@ def get_image_base64(path):
 
 img_data = get_image_base64("m.jpg")
 
-# 2. إضافة حزمة CSS المخصصة بالألوان والباليتة الجديدة بالكامل
+# 2. إضافة حزمة CSS المخصصة
 st.markdown("""
     <style>
     /* تغيير الخلفية العامة إلى الخلفية العاجية الدافئة */
@@ -94,22 +94,16 @@ st.markdown("""
         padding: 10px;
     }
 
-    /* فئات مخصصة لمؤشرات نتائج الـ AI الحساسة */
-    .card-normal {
-        border: 2px solid #28A745;
+    /* حواف نتائج الـ AI بالدرجات المطلوبة (الوردي الناعم #E8A7A1 والوردي الغامق #D4A5B8) */
+    .card-pink-light {
+        border: 2px solid #E8A7A1;
         padding: 20px;
         border-radius: 6px;
         background-color: #FAFAF6;
     }
-    .card-warning {
-        border: 2px solid #FFC107;
+    .card-pink-dark {
+        border: 2px solid #D4A5B8;
         padding: 20px;
-        border-radius: 6px;
-        background-color: #FAFAF6;
-    }
-    .card-danger {
-        border: 2px solid #DC3545;
-        padding: 25px;
         border-radius: 6px;
         background-color: #FAFAF6;
     }
@@ -181,7 +175,7 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم توسيط العبارة تماماً بالداخل
     if st.session_state.page == 1:
         st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
         if img_data:
@@ -195,8 +189,11 @@ if menu_selection == "🔬 New AI Diagnostics":
             logo_html = "<h2 style='color: #2E4A62 !important; font-size: 2rem; margin-bottom: 20px; letter-spacing: 2px;'>ENGINEERING TITANS</h2>"
             
         st.markdown(logo_html, unsafe_allow_html=True)
-        st.title("Mammogram AI Diagnostics System")
-        st.markdown("<p style='color: #2E4A62; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
+        st.markdown("<h1>Mammogram AI Diagnostics System</h1>", unsafe_allow_html=True)
+        
+        # العبارة موضوعة هنا بداخل حاوية التوسط المطلق سنتر
+        st.markdown("<p style='color: #2E4A62; font-size: 1.1rem; margin-top: -5px; text-align: center; width: 100%;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
+        
         st.markdown("<hr style='border-top: 2px solid #D4A5B8; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
         st.write("")
         st.write("")
@@ -259,25 +256,23 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p3_next")
 
-    # الواجهة 4: النتيجة الأولية (Normal / Abnormal) - مجهزة بقوالب الألوان الحساسة للنتائج (الأخضر والأصفر)
+    # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
     elif st.session_state.page == 4:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
         st.write("")
         
         col_res1, col_res2 = st.columns(2)
         with col_res1:
-            # تم استخدام الفئة card-normal للأخضر السليم المستقبلي
             st.markdown("""
-                <div class="card-normal">
-                    <h3 style='color: #28A745 !important; margin: 0; text-align: center;'>NORMAL</h3>
+                <div class="card-pink-light">
+                    <h3 style='color: #2E4A62 !important; margin: 0; text-align: center;'>NORMAL</h3>
                     <p style='color: #2E4A62; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
                 </div>
             """, unsafe_allow_html=True)
         with col_res2:
-            # تم استخدام الفئة card-warning للأصفر/البرتقالي للمراجعة والتنبيه المستقبلي
             st.markdown("""
-                <div class="card-warning">
-                    <h3 style='color: #FFC107 !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
+                <div class="card-pink-dark">
+                    <h3 style='color: #2E4A62 !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
                     <p style='color: #2E4A62; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
                 </div>
             """, unsafe_allow_html=True)
@@ -296,7 +291,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p4_next")
 
-    # الواجهة 5: تفصيل النتيجة (Benign / Malignant) - مجهزة بقوالب الأصفر للمراجعة والأحمر للحالات العاجلة
+    # الواجهة 5: تفصيل النتيجة (Benign / Malignant)
     elif st.session_state.page == 5:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
         st.write("")
@@ -308,18 +303,16 @@ if menu_selection == "🔬 New AI Diagnostics":
         
         col_b, col_m = st.columns(2)
         with col_b:
-            # تم ربطها بـ card-warning الأصفر لحالات المراجعة المطمئنة نسبياً
             st.markdown("""
-                <div class="card-warning">
-                    <h3 style='color: #FFC107 !important; margin: 0; text-align: center;'>BENIGN</h3>
+                <div class="card-pink-light">
+                    <h3 style='color: #2E4A62 !important; margin: 0; text-align: center;'>BENIGN</h3>
                     <p style='color: #2E4A62; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
                 </div>
             """, unsafe_allow_html=True)
         with col_m:
-            # تم ربطها بـ card-danger الأحمر للحالات الصعبة والعاجلة التي تتطلب فحصاً فورياً
             st.markdown("""
-                <div class="card-danger">
-                    <h3 style='color: #DC3545 !important; margin: 0; text-align: center;'>MALIGNANT</h3>
+                <div class="card-pink-dark">
+                    <h3 style='color: #2E4A62 !important; margin: 0; text-align: center;'>MALIGNANT</h3>
                     <p style='color: #2E4A62; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
                 </div>
             """, unsafe_allow_html=True)
@@ -363,8 +356,6 @@ elif menu_selection == "📋 Patients Medical Log":
                 filtered_df = df_log
 
             filtered_df = filtered_df.iloc[::-1]
-            
-            # عرض الجدول مع حدود متناسقة مع الرمادي الفاتح #EAEAEA
             st.dataframe(filtered_df, use_container_width=True, hide_index=True)
             st.write("")
             
