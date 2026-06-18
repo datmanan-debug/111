@@ -85,7 +85,7 @@ if st.session_state.page == 1:
     st.write("") # مسافات علوية لضبط المظهر
     st.write("")
     
-    # استخدام نظام الأعمدة لتوسيط الكلمة والصورة بجانب بعضهما تماماً بدون أي خلفيات مقيدة
+    # محاذاة النص والصورة بجانب بعضهما في المنتصف بدون أي خلفية مقيدة
     col_l, col_content, col_r = st.columns([1, 5, 1])
     
     with col_content:
@@ -94,7 +94,6 @@ if st.session_state.page == 1:
             st.markdown("<h2 style='color: #1A365D !important; font-size: 1.8rem; margin-top: 15px; letter-spacing: 2px; text-align: right;'>ENGINEERING TITANS</h2>", unsafe_allow_html=True)
         with c2:
             if os.path.exists("m.jpg"):
-                # تم تكبير الصورة وعرضها باستخدام دالة ستريمليت الأصلية لضمان ظهورها
                 st.image("m.jpg", width=65)
             else:
                 st.markdown("<span style='color:red; font-size:0.8rem;'>Missing m.jpg</span>", unsafe_allow_html=True)
@@ -103,15 +102,15 @@ if st.session_state.page == 1:
     st.title("Mammogram AI Diagnostics System")
     st.markdown("<p style='color: #4A5568; font-size: 1.1rem; text-align: center;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
     
-    # الخط الفاصل أصبح هنا بالأسفل تحت العبارة مباشرة
+    # الخط الفاصل تحت العبارة مباشرة
     st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 20px auto;'>", unsafe_allow_html=True)
     
     st.write("")
     st.write("")
     
-    # زر الانتقال في الأسفل باسم Next فقط
-    col1, col2, col3 = st.columns([1, 1.2, 1])
-    with col2:
+    # زر الانتقال (Next) في المنتصف تماماً
+    col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
+    with col_btn_mid:
         st.button("Next", on_click=next_page)
 
 # ==========================================
