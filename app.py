@@ -25,7 +25,7 @@ def get_image_base64(path):
 
 img_data = get_image_base64("m.jpg")
 
-# 2. إضافة حزمة CSS المخصصة للتصميم الرسمي الكلاسيكي والتوسط المطلق
+# 2. إضافة حزمة CSS المخصصة بالألوان الجديدة بدقة
 st.markdown("""
     <style>
     /* تغيير الخلفية العامة إلى الرمادي البارد المريح */
@@ -35,7 +35,7 @@ st.markdown("""
     
     /* العناوين الرئيسية باللون الكحلي الداكن الموثوق */
     h1, h2, h3 {
-        color: #1A365D !important;
+        color: #1A2B4C !important;
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 700;
         text-align: center;
@@ -56,10 +56,10 @@ st.markdown("""
         width: 100%;
     }
 
-    /* تنسيق مخصص للأزرار */
+    /* تنسيق مخصص للأزرار باللون الكحلي الداكن */
     div.stButton > button {
         width: 100% !important;
-        background-color: #2B6CB0 !important;
+        background-color: #1A2B4C !important;
         color: white !important;
         border-radius: 6px !important;
         padding: 10px 20px !important;
@@ -68,21 +68,30 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     div.stButton > button:hover {
-        background-color: #1A365D !important;
+        background-color: #E8A7A1 !important;
+        color: #1A2B4C !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
-    /* تأثير الباركود الرقمي أو لمسة الذكاء الاصطناعي */
+    /* تأثير شارة الذكاء الاصطناعي باللون الوردي الناعم */
     .ai-badge {
-        background-color: #EBF8FF;
-        color: #2B6CB0;
+        background-color: #FFF5F5;
+        color: #1A2B4C;
         padding: 6px 12px;
         border-radius: 4px;
         font-size: 0.85rem;
         font-weight: bold;
         display: inline-block;
         margin-bottom: 15px;
-        border: 1px solid #BEE3F8;
+        border: 1px solid #E8A7A1;
+    }
+
+    /* تنسيق منطقة رفع الملفات المتناسق مع الأزرق السماوي */
+    .stFileUploader {
+        background-color: #E6EFF9 !important;
+        border: 2px dashed #1A2B4C !important;
+        border-radius: 8px;
+        padding: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -93,7 +102,7 @@ if 'page' not in st.session_state:
 
 # تهيئة بيانات المريض الافتراضية لضمان الحفظ الصحيح
 if 'patient_name' not in st.session_state: st.session_state.patient_name = ""
-if 'patient_age' not in st.session_state: st.session_state.patient_age = ""  # تم تركه فارغاً بناءً على طلبك
+if 'patient_age' not in st.session_state: st.session_state.patient_age = ""  
 if 'patient_phone' not in st.session_state: st.session_state.patient_phone = ""
 if 'patient_history' not in st.session_state: st.session_state.patient_history = "No"
 
@@ -104,7 +113,6 @@ def prev_page(): st.session_state.page -= 1
 # دالة حفظ البيانات في ملف الـ CSV وتصفير النظام للعودة للواجهة الأولى
 def save_and_reset():
     now = datetime.now()
-    # تجهيز البيانات الجديدة للحفظ مع فصل التاريخ عن الوقت
     new_record = {
         "Date": now.strftime("%Y-%m-%d"),
         "Time": now.strftime("%H:%M:%S"),
@@ -112,7 +120,7 @@ def save_and_reset():
         "Age": st.session_state.patient_age if st.session_state.patient_age else "N/A",
         "Phone": st.session_state.patient_phone if st.session_state.patient_phone else "N/A",
         "History of Pathology": st.session_state.patient_history,
-        "AI Diagnostics Result": "Pending Correlation"  # بانتظار ربط مخرجات النموذج الفعلي
+        "AI Diagnostics Result": "Pending Correlation"  
     }
     
     df_new = pd.DataFrame([new_record])
@@ -130,7 +138,6 @@ def save_and_reset():
     else:
         df_new.to_csv(LOG_FILE, index=False)
         
-    # تصفير المدخلات للعودة للحالة الأولى بنجاح
     st.session_state.page = 1
     st.session_state.patient_name = ""
     st.session_state.patient_age = ""
@@ -141,13 +148,13 @@ def save_and_reset():
 # بناء القائمة الجانبية (Sidebar Navigation)
 # ==========================================
 with st.sidebar:
-    st.markdown("<h2 style='text-align: left; font-size: 1.5rem; margin-bottom: 20px;'>⚙️ Control Panel</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: left; font-size: 1.5rem; margin-bottom: 20px; color: #1A2B4C;'>⚙️ Control Panel</h2>", unsafe_allow_html=True)
     menu_selection = st.radio(
         "Navigate System Modules:",
         ["🔬 New AI Diagnostics", "📋 Patients Medical Log"]
     )
-    st.markdown("---")
-    st.markdown("<small style='color: #718096;'>System Status: <b>Online</b><br>Database: <b>Local CSV</b></small>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-top: 1px solid #E8A7A1;'>", unsafe_allow_html=True)
+    st.markdown("<small style='color: #1A2B4C;'>System Status: <b>Online</b><br>Database: <b>Local CSV</b></small>", unsafe_allow_html=True)
 
 # ==========================================
 # القسم الأول: نظام الفحص (5 واجهات تتابعية)
@@ -160,17 +167,17 @@ if menu_selection == "🔬 New AI Diagnostics":
         if img_data:
             logo_html = f"""
             <div style='display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;'>
-                <h2 style='color: #1A365D !important; font-size: 2rem; margin: 0; letter-spacing: 2px;'>ENGINEERING TITANS</h2>
+                <h2 style='color: #1A2B4C !important; font-size: 2rem; margin: 0; letter-spacing: 2px;'>ENGINEERING TITANS</h2>
                 <img src='data:image/jpeg;base64,{img_data}' style='height: 60px; width: auto; object-fit: contain; mix-blend-mode: multiply;'>
             </div>
             """
         else:
-            logo_html = "<h2 style='color: #1A365D !important; font-size: 2rem; margin-bottom: 20px; letter-spacing: 2px;'>ENGINEERING TITANS</h2>"
+            logo_html = "<h2 style='color: #1A2B4C !important; font-size: 2rem; margin-bottom: 20px; letter-spacing: 2px;'>ENGINEERING TITANS</h2>"
             
         st.markdown(logo_html, unsafe_allow_html=True)
         st.title("Mammogram AI Diagnostics System")
-        st.markdown("<p style='color: #4A5568; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
-        st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #1A2B4C; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-top: 2px solid #E8A7A1; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
         st.write("")
         st.write("")
         
@@ -181,7 +188,7 @@ if menu_selection == "🔬 New AI Diagnostics":
 
     # الواجهة 2: بيانات المريض الطبية (Patient Info)
     elif st.session_state.page == 2:
-        st.markdown("<h2 style='text-align: left;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: left; color: #1A2B4C;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
         st.markdown("Please enter the patient's records accurately to map with the DICOM metadata.")
         st.write("")
         
@@ -189,7 +196,6 @@ if menu_selection == "🔬 New AI Diagnostics":
         
         col_age, col_phone = st.columns(2)
         with col_age:
-            # تم ترك القيمة فارغة بناءً على طلبك
             st.session_state.patient_age = st.text_input("Patient Age", value=st.session_state.patient_age)
         with col_phone:
             st.session_state.patient_phone = st.text_input("Contact Number", value=st.session_state.patient_phone)
@@ -198,7 +204,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         
         st.write("")
         st.write("")
-        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-top: 1px solid #E8A7A1; margin: 20px 0;'>", unsafe_allow_html=True)
         
         col_back, col_next = st.columns([1, 1])
         with col_back:
@@ -208,13 +214,13 @@ if menu_selection == "🔬 New AI Diagnostics":
 
     # الواجهة 3: رفع ملف الـ DICOM (Upload File)
     elif st.session_state.page == 3:
-        st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: left; color: #1A2B4C;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
         st.write("")
         st.markdown("<span class='ai-badge'>Supports standard .dcm / .dicom formats</span>", unsafe_allow_html=True)
         
         uploaded_file = st.file_uploader("Upload Digital Mammography (DICOM File)", type=["dcm", "dicom"])
         st.markdown("""
-            <div style='margin-top: 5px; margin-bottom: 20px; font-size: 0.85rem; color: #718096;'>
+            <div style='margin-top: 5px; margin-bottom: 20px; font-size: 0.85rem; color: #1A2B4C;'>
                 ⚠️ Max file size: 200MB. Data is encrypted and processed locally ensuring HIPAA compliance.
             </div>
         """, unsafe_allow_html=True)
@@ -225,7 +231,7 @@ if menu_selection == "🔬 New AI Diagnostics":
             st.success("Analysis complete. Ready to view results.")
             
         st.write("")
-        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-top: 1px solid #E8A7A1; margin: 20px 0;'>", unsafe_allow_html=True)
         
         col_back, col_next = st.columns([1, 1])
         with col_back:
@@ -233,75 +239,75 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p3_next")
 
-    # الواجهة 4: النتيجة الأولية (Normal / Abnormal) - تم إلغاء تحديد النتيجة الافتراضية وتوحيد التصميم
+    # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
     elif st.session_state.page == 4:
-        st.markdown("<h2 style='text-align: left;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: left; color: #1A2B4C;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
         st.write("")
         
         col_res1, col_res2 = st.columns(2)
         with col_res1:
             st.markdown("""
-                <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC;'>
-                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>NORMAL</h3>
-                    <p style='color: #718096; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
+                <div style='border: 1px solid #1A2B4C; padding: 20px; border-radius: 6px; background-color: #E6EFF9;'>
+                    <h3 style='color: #1A2B4C !important; margin: 0; text-align: center;'>NORMAL</h3>
+                    <p style='color: #1A2B4C; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
                 </div>
             """, unsafe_allow_html=True)
         with col_res2:
             st.markdown("""
-                <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC;'>
-                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
-                    <p style='color: #718096; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
+                <div style='border: 1px solid #1A2B4C; padding: 20px; border-radius: 6px; background-color: #E6EFF9;'>
+                    <h3 style='color: #1A2B4C !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
+                    <p style='color: #1A2B4C; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
                 </div>
             """, unsafe_allow_html=True)
             
         st.markdown("""
-            <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>
+            <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #E6EFF9; border-radius: 6px; font-size: 0.9rem; color: #1A2B4C; border-left: 4px solid #E8A7A1;'>
                 💡 <b>AI Recommendation:</b> Verification of inference layers. Secondary classification tracks can be populated dynamically post-execution.
             </div>
         """, unsafe_allow_html=True)
         
         st.write("")
-        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-top: 1px solid #E8A7A1; margin: 20px 0;'>", unsafe_allow_html=True)
         col_back, col_next = st.columns([1, 1])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p4_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p4_next")
 
-    # الواجهة 5: تفصيل النتيجة (Benign / Malignant) - تم إلغاء تحديد الخيار الافتراضي وتوحيد التصميم
+    # الواجهة 5: تفصيل النتيجة (Benign / Malignant)
     elif st.session_state.page == 5:
-        st.markdown("<h2 style='text-align: left;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: left; color: #1A2B4C;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
         st.write("")
         st.markdown("""
-            <div style='background-color: #EDF2F7; border: 1px solid #CBD5E0; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
-                <span style='color: #4A5568; font-weight: bold;'>Inference Status: Computing Secondary Probability Tracks</span>
+            <div style='background-color: #E6EFF9; border: 1px solid #1A2B4C; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
+                <span style='color: #1A2B4C; font-weight: bold;'>Inference Status: Computing Secondary Probability Tracks</span>
             </div>
         """, unsafe_allow_html=True)
         
         col_b, col_m = st.columns(2)
         with col_b:
             st.markdown("""
-                <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC;'>
-                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>BENIGN</h3>
-                    <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
+                <div style='border: 1px solid #1A2B4C; padding: 25px; border-radius: 6px; background-color: #E6EFF9;'>
+                    <h3 style='color: #1A2B4C !important; margin: 0; text-align: center;'>BENIGN</h3>
+                    <p style='color: #1A2B4C; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
                 </div>
             """, unsafe_allow_html=True)
         with col_m:
             st.markdown("""
-                <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC;'>
-                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>MALIGNANT</h3>
-                    <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
+                <div style='border: 1px solid #1A2B4C; padding: 25px; border-radius: 6px; background-color: #E6EFF9;'>
+                    <h3 style='color: #1A2B4C !important; margin: 0; text-align: center;'>MALIGNANT</h3>
+                    <p style='color: #1A2B4C; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
                 </div>
             """, unsafe_allow_html=True)
             
         st.markdown("""
-            <div style='text-align: left; margin-top: 25px; border-left: 4px solid #1A365D; padding-left: 15px; font-size: 0.85rem; color: #4A5568;'>
+            <div style='text-align: left; margin-top: 25px; border-left: 4px solid #E8A7A1; padding-left: 15px; font-size: 0.85rem; color: #1A2B4C;'>
                 <b>Engineering Titans System Note:</b> This evaluation module is optimized to hook into deep neural layer prediction logits. Resulting pipelines require correlation with expert histopathological analysis.
             </div>
         """, unsafe_allow_html=True)
         
         st.write("")
-        st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-top: 1px solid #E8A7A1; margin: 20px 0;'>", unsafe_allow_html=True)
         
         col_back, col_next = st.columns([1, 1])
         with col_back:
@@ -313,7 +319,7 @@ if menu_selection == "🔬 New AI Diagnostics":
 # القسم الثاني: السجل الطبي للمرضى
 # ==========================================
 elif menu_selection == "📋 Patients Medical Log":
-    st.markdown("<h2 style='text-align: left;'>📋 Patients Diagnostic Log Database</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: left; color: #1A2B4C;'>📋 Patients Diagnostic Log Database</h2>", unsafe_allow_html=True)
     st.markdown("Review, search, and export historical diagnostic sessions saved on the system.")
     st.write("")
     
@@ -358,7 +364,7 @@ elif menu_selection == "📋 Patients Medical Log":
 
 # 4. تذييل الصفحة الرسمي الثابت (Footer)
 st.markdown("""
-    <div style='text-align: center; margin-top: 50px; font-size: 0.8rem; color: #A0AEC0;'>
+    <div style='text-align: center; margin-top: 50px; font-size: 0.8rem; color: #1A2B4C;'>
         © 2026 Engineering Titans. All Rights Reserved. Clinical AI Decision Support Tool.
     </div>
 """, unsafe_allow_html=True)
