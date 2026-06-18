@@ -25,7 +25,7 @@ def get_image_base64(path):
 
 img_data = get_image_base64("m.jpg")
 
-# 2. إضافة حزمة CSS المخصصة للتحكم المطلق بمواقع وتجاور الأزرار
+# 2. إضافة حزمة CSS المخصصة للتحكم المطلق بموقع زر الصفحة الأولى وتجاور أزرار باقي الواجهات
 st.markdown("""
     <style>
     /* تغيير الخلفية العامة إلى الخلفية العاجية الدافئة */
@@ -56,7 +56,7 @@ st.markdown("""
         width: 100%;
     }
 
-    /* تنسيق مخصص للأزرار باللون الأزرق البترولي والتوسط الحقيقي */
+    /* التنسيق الأساسي للأزرار */
     div.stButton > button {
         background-color: #2E4A62 !important;
         color: white !important;
@@ -65,13 +65,23 @@ st.markdown("""
         border: none !important;
         font-weight: 600 !important;
         transition: all 0.3s ease;
-        display: block !important;
-        margin: 0 auto !important; /* فرض التوسط داخل الحاويات */
     }
-    
-    /* جعل أزرار الواجهة الأولى بوزن مناسب ومحاذاة في السنتر */
+
+    /* 🟢 كود حديدي لفرض التوسط لزر الواجهة الأولى في المنتصف 100% وإزالة تأثير الـ Float اليمين */
+    .p1-btn-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin: 20px auto 0 auto !important;
+    }
+    .p1-btn-container div.stButton {
+        display: flex !important;
+        justify-content: center !important;
+        width: auto !important;
+    }
     .p1-btn-container div.stButton > button {
-        width: 150px !important;
+        width: 160px !important;
     }
 
     /* جعل أزرار باقي الواجهات تملأ الأعمدة المتقاربة بشكل متناسق */
@@ -106,7 +116,7 @@ st.markdown("""
         padding: 10px;
     }
 
-    /* حواف نتائج الـ AI بالدرجات المطلوبة (الوردي الناعم #E8A7A1 والوردي الغامق #D4A5B8) */
+    /* حواف نتائج الـ AI بالدرجات المطلوبة */
     .card-pink-light {
         border: 2px solid #E8A7A1;
         padding: 20px;
@@ -187,7 +197,7 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم ضبط الزر في السنتر المطلق 100% بدون Columns
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم إجبار الزر على البقاء في السنتر المطلق عبر حاوية Flex المحدثة
     if st.session_state.page == 1:
         st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
         if img_data:
@@ -208,8 +218,8 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.write("")
         
-        # حاوية مخصصة لفرض توسيط زر الواجهة الأولى منعاً للانحراف الطبيعي لليسار
-        st.markdown("<div class='p1-btn-container' style='width: 100%; text-align: center;'>", unsafe_allow_html=True)
+        # 🟢 الحاوية المحدثة لفرض السنتر 100% وإلغاء إنحياز اليمين للزر الافتراضي لستريمليت
+        st.markdown("<div class='p1-btn-container'>", unsafe_allow_html=True)
         st.button("Next", on_click=next_page, key="btn_p1_next")
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
