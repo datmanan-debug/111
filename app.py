@@ -166,7 +166,7 @@ elif st.session_state.page == 2:
         st.button("Next", on_click=next_page)
 
 # ==========================================
-# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم جعل الزر Next
+# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم حل مشكلة القفل هنا
 # ==========================================
 elif st.session_state.page == 3:
     st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
@@ -182,9 +182,7 @@ elif st.session_state.page == 3:
         </div>
     """, unsafe_allow_html=True)
     
-    file_ready = False
     if uploaded_file is not None:
-        file_ready = True
         with st.spinner("AI Engine running inference... Processing pixel arrays and neural layers."):
             time.sleep(1.5) 
         st.success("Analysis complete. Ready to view results.")
@@ -196,8 +194,8 @@ elif st.session_state.page == 3:
     with col_back:
         st.button("Back", on_click=prev_page)
     with col_next:
-        # تم تعديل النص ليصبح "Next" فقط
-        st.button("Next", on_click=next_page, disabled=not file_ready)
+        # تم إزالة الحظر (disabled) ليعمل الزر الآن مباشرة وبحرية تامة
+        st.button("Next", on_click=next_page)
 
 # ==========================================
 # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
