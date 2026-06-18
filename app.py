@@ -166,7 +166,7 @@ elif st.session_state.page == 2:
         st.button("Next", on_click=next_page)
 
 # ==========================================
-# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم حل مشكلة القفل هنا
+# الواجهة 3: رفع ملف الـ DICOM (Upload File)
 # ==========================================
 elif st.session_state.page == 3:
     st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
@@ -194,47 +194,49 @@ elif st.session_state.page == 3:
     with col_back:
         st.button("Back", on_click=prev_page)
     with col_next:
-        # تم إزالة الحظر (disabled) ليعمل الزر الآن مباشرة وبحرية تامة
         st.button("Next", on_click=next_page)
 
 # ==========================================
-# الواجهة 4: النتيجة الأولية (Normal / Abnormal)
+# الواجهة 4: النتيجة الأولية (Normal / Abnormal) - تم تعديلها وحذف المربع والشارة
 # ==========================================
 elif st.session_state.page == 4:
-    st.subheader("🔬 AI Diagnostic Analysis Result")
+    st.markdown("<h2 style='text-align: left;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
+    st.write("")
     
-    st.markdown("<div class='custom-card' style='text-align: center;'>", unsafe_allow_html=True)
-    st.markdown("<span class='ai-badge'>Classification Layer: Binary Screening</span>", unsafe_allow_html=True)
-    
+    # النتائج تظهر مباشرة على الخلفية الشفافة
     col_res1, col_res2 = st.columns(2)
     
     with col_res1:
         st.markdown("""
             <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.6;'>
-                <h3 style='color: #718096 !important; margin: 0;'>NORMAL</h3>
-                <p style='color: #A0AEC0; font-size: 0.9rem; margin: 5px 0 0 0;'>Confidence: --</p>
+                <h3 style='color: #718096 !important; margin: 0; text-align: center;'>NORMAL</h3>
+                <p style='color: #A0AEC0; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --</p>
             </div>
         """, unsafe_allow_html=True)
         
     with col_res2:
         st.markdown("""
             <div style='border: 2px solid #9B2C2C; padding: 20px; border-radius: 6px; background-color: #FFF5F5;'>
-                <h3 style='color: #9B2C2C !important; margin: 0;'>ABNORMAL FINDINGS</h3>
-                <p style='color: #C53030; font-size: 0.9rem; margin: 5px 0 0 0;'>Confidence: 94.2%</p>
+                <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
+                <p style='color: #C53030; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: 94.2%</p>
             </div>
         """, unsafe_allow_html=True)
         
     st.markdown("""
-        <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
+        <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>
+            💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
         </div>
     """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
     
+    st.write("")
+    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+    
+    # الأزرار في الأسفل: Back و Next فقط
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("← Back to Upload", on_click=prev_page)
+        st.button("Back", on_click=prev_page)
     with col_next:
-        st.button("Detailed Pathology Breakdown →", on_click=next_page)
+        st.button("Next", on_click=next_page)
 
 # ==========================================
 # الواجهة 5: تفصيل النتيجة (Benign / Malignant)
