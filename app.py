@@ -112,11 +112,6 @@ st.markdown("""
         border-radius: 6px;
         background-color: #FAFAF6;
     }
-
-    /* 🛑 كود إخفاء المربع الكحلي أو أي زر زائد في الواجهة الأولى تماماً */
-    .hidden-element, div[data-testid="stButton"]:has(button[id^="hidden"]) {
-        display: none !important;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -185,14 +180,10 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم إخفاء الزر الزائد تماماً واختفى المربع
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم دمج الزر بالـ HTML والـ JS ليصبح بالوسط المطلق 100% رغماً عن المنصة
     if st.session_state.page == 1:
-        
-        # حاوية مخفية تماماً لمنع ظهور أي مربع كحلي علوي
-        st.markdown("<div class='hidden-element'>", unsafe_allow_html=True)
-        trigger_p1 = st.button("", key="hidden_p1_trigger")
-        st.markdown("</div>", unsafe_allow_html=True)
-        
+        # التقاط إشارة نقرة الزر المخفي في ستريمليت عبر الرابط البرمجي الخلفي للـ HTML
+        trigger_p1 = st.button("", key="hidden_p1_trigger", help=None)
         if trigger_p1:
             next_page()
             st.rerun()
@@ -216,7 +207,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.write("")
         
-        # بناء زر الـ HTML الموسط بالكامل بدون أي شوائب بصرية
+        # 🟢 بناء زر HTML وتوسيطه بالكامل مع ستايل المشروع وبدون تداخلات برمجية جانبية
         html_button = """
         <div style='width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 10px;'>
             <button id='click_p1_btn' style='
@@ -234,11 +225,18 @@ if menu_selection == "🔬 New AI Diagnostics":
             '>Next</button>
         </div>
         <script>
+            // ربط ضغطة زر الـ HTML الموسط بالزر البرمجي الخفي الخاص بستريمليت لتغيير الصفحة
             const btn = document.getElementById('click_p1_btn');
             btn.addEventListener('click', function() {
-                // تفعيل الزر المخفي البرمي لستريمليت للانتقال بسلاسة
-                window.parent.document.querySelector('.hidden-element button').click();
+                const streamlitButtons = window.parent.document.querySelectorAll('.stButton button');
+                for (let i = 0; i < streamlitButtons.length; i++) {
+                    if (streamlitButtons[i].innerText === "") {
+                        streamlitButtons[i].click();
+                        break;
+                    }
+                }
             });
+            // تأثير الهوفر المرن عند تمرير الماوس
             btn.onmouseover = function() { this.style.backgroundColor = '#D4A5B8'; this.style.color = '#2E4A62'; };
             btn.onmouseout = function() { this.style.backgroundColor = '#2E4A62'; this.style.color = 'white'; };
         </script>
@@ -246,7 +244,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.components.v1.html(html_button, height=60)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # الواجهة 2: بيانات المريض الطبية (Patient Info)
+    # الواجهة 2: بيانات المريض الطبية (Patient Info) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 2:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
         st.markdown("Please enter the patient's records accurately to map with the DICOM metadata.")
@@ -265,6 +263,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
+        # أزرار متقاربة ومتوسطة
         st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
@@ -273,7 +272,7 @@ if menu_selection == "🔬 New AI Diagnostics":
             st.button("Next", on_click=next_page, key="btn_p2_next")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # الواجهة 3: رفع ملف الـ DICOM
+    # الواجهة 3: رفع ملف الـ DICOM (Upload File) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 3:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
         st.write("")
@@ -294,6 +293,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
+        # أزرار متقاربة ومتوسطة
         st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
@@ -302,7 +302,7 @@ if menu_selection == "🔬 New AI Diagnostics":
             st.button("Next", on_click=next_page, key="btn_p3_next")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
+    # الواجهة 4: النتيجة الأولية (Normal / Abnormal) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 4:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
         st.write("")
@@ -332,6 +332,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
+        # أزرار متقاربة ومتوسطة
         st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
@@ -340,7 +341,7 @@ if menu_selection == "🔬 New AI Diagnostics":
             st.button("Next", on_click=next_page, key="btn_p4_next")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # الواجهة 5: تفصيل النتيجة (Benign / Malignant)
+    # الواجهة 5: تفصيل النتيجة (Benign / Malignant) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 5:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
         st.write("")
@@ -375,6 +376,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
+        # أزرار متقاربة ومتوسطة
         st.markdown("<div class='inner-pages-buttons'>", unsafe_allow_html=True)
         col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
