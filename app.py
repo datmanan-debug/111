@@ -36,7 +36,7 @@ st.markdown("""
         text-align: center;
     }
     
-    /* تنسيق الحاويات والمربعات للواجهات الأخرى */
+    /* تنسيق الحاويات والمربعات للواجهات الأخرى المتبقية */
     .custom-card {
         background-color: #FFFFFF;
         padding: 30px;
@@ -149,7 +149,6 @@ elif st.session_state.page == 2:
     
     col_age, col_phone = st.columns(2)
     with col_age:
-        # تم تغيير الحقل هنا إلى حقل نصي عادي بدون أزرار زائد وناقص
         st.text_input("Patient Age", value="45")
     with col_phone:
         st.text_input("Contact Number")
@@ -167,23 +166,23 @@ elif st.session_state.page == 2:
         st.button("Next", on_click=next_page)
 
 # ==========================================
-# الواجهة 3: رفع ملف الـ DICOM (Upload File)
+# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم تعديلها وحذف المربع
 # ==========================================
 elif st.session_state.page == 3:
-    st.subheader("📂 Mammography File Ingestion")
+    st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
     st.markdown(f"Patient Record: **{st.session_state.patient_name if st.session_state.patient_name else 'Anonymous'}**")
+    st.write("")
     
-    st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+    # العناصر تظهر الآن مباشرة على خلفية الصفحة الشفافة بدون المربع الأبيض القديم
     st.markdown("<span class='ai-badge'>Supports standard .dcm / .dicom formats</span>", unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader("Upload Digital Mammography (DICOM File)", type=["dcm", "dicom"])
     
     st.markdown("""
-        <div style='margin-top: 15px; font-size: 0.85rem; color: #718096;'>
+        <div style='margin-top: 5px; margin-bottom: 20px; font-size: 0.85rem; color: #718096;'>
             ⚠️ Max file size: 200MB. Data is encrypted and processed locally ensuring HIPAA compliance.
         </div>
     """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
     
     file_ready = False
     if uploaded_file is not None:
@@ -192,11 +191,15 @@ elif st.session_state.page == 3:
             time.sleep(1.5) 
         st.success("Analysis complete. Ready to view results.")
         
+    st.write("")
+    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+    
+    # أزرار التنقل بالأسفل متناسقة تماماً
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("← Back", on_click=prev_page)
+        st.button("Back", on_click=prev_page)
     with col_next:
-        st.button("Run AI Diagnostics →", on_click=next_page, disabled=not file_ready)
+        st.button("Run AI Diagnostics", on_click=next_page, disabled=not file_ready)
 
 # ==========================================
 # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
