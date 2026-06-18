@@ -93,7 +93,7 @@ if 'page' not in st.session_state:
 
 # تهيئة بيانات المريض الافتراضية لضمان الحفظ الصحيح
 if 'patient_name' not in st.session_state: st.session_state.patient_name = ""
-if 'patient_age' not in st.session_state: st.session_state.patient_age = "45"
+if 'patient_age' not in st.session_state: st.session_state.patient_age = ""  # تم تركه فارغاً بناءً على طلبك
 if 'patient_phone' not in st.session_state: st.session_state.patient_phone = ""
 if 'patient_history' not in st.session_state: st.session_state.patient_history = "No"
 
@@ -104,24 +104,22 @@ def prev_page(): st.session_state.page -= 1
 # دالة حفظ البيانات في ملف الـ CSV وتصفير النظام للعودة للواجهة الأولى
 def save_and_reset():
     now = datetime.now()
-    # 1. تجهيز البيانات الجديدة للحفظ مع فصل التاريخ عن الوقت
+    # تجهيز البيانات الجديدة للحفظ مع فصل التاريخ عن الوقت
     new_record = {
         "Date": now.strftime("%Y-%m-%d"),
         "Time": now.strftime("%H:%M:%S"),
         "Patient Name": st.session_state.patient_name if st.session_state.patient_name else "Anonymous",
-        "Age": st.session_state.patient_age,
+        "Age": st.session_state.patient_age if st.session_state.patient_age else "N/A",
         "Phone": st.session_state.patient_phone if st.session_state.patient_phone else "N/A",
         "History of Pathology": st.session_state.patient_history,
-        "AI Diagnostics Result": "Malignant (87.6%)"
+        "AI Diagnostics Result": "Pending Correlation"  # بانتظار ربط مخرجات النموذج الفعلي
     }
     
     df_new = pd.DataFrame([new_record])
     
-    # 2. فحص الملف وإعادة تهيئته للتوافق مع الأعمدة المفصولة تلقائياً
     if os.path.exists(LOG_FILE):
         try:
             df_old = pd.read_csv(LOG_FILE)
-            # إذا كان الملف القديم يحتوي على العمود المدمج القديم، نقوم بحذفه لتهيئة الجديد
             if "Date & Time" in df_old.columns:
                 df_new.to_csv(LOG_FILE, index=False)
             else:
@@ -132,10 +130,10 @@ def save_and_reset():
     else:
         df_new.to_csv(LOG_FILE, index=False)
         
-    # 3. تصفير المدخلات للعودة للحالة الأولى بنجاح
+    # تصفير المدخلات للعودة للحالة الأولى بنجاح
     st.session_state.page = 1
     st.session_state.patient_name = ""
-    st.session_state.patient_age = "45"
+    st.session_state.patient_age = ""
     st.session_state.patient_phone = ""
     st.session_state.patient_history = "No"
 
@@ -191,6 +189,7 @@ if menu_selection == "🔬 New AI Diagnostics":
         
         col_age, col_phone = st.columns(2)
         with col_age:
+            # تم ترك القيمة فارغة بناءً على طلبك
             st.session_state.patient_age = st.text_input("Patient Age", value=st.session_state.patient_age)
         with col_phone:
             st.session_state.patient_phone = st.text_input("Contact Number", value=st.session_state.patient_phone)
@@ -234,29 +233,30 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p3_next")
 
-    # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
+    # الواجهة 4: النتيجة الأولية (Normal / Abnormal) - تم إلغاء تحديد النتيجة الافتراضية وتوحيد التصميم
     elif st.session_state.page == 4:
         st.markdown("<h2 style='text-align: left;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
         st.write("")
+        
         col_res1, col_res2 = st.columns(2)
         with col_res1:
             st.markdown("""
-                <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.6;'>
-                    <h3 style='color: #718096 !important; margin: 0; text-align: center;'>NORMAL</h3>
-                    <p style='color: #A0AEC0; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --</p>
+                <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC;'>
+                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>NORMAL</h3>
+                    <p style='color: #718096; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
                 </div>
             """, unsafe_allow_html=True)
         with col_res2:
             st.markdown("""
-                <div style='border: 2px solid #9B2C2C; padding: 20px; border-radius: 6px; background-color: #FFF5F5;'>
-                    <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
-                    <p style='color: #C53030; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: 94.2%</p>
+                <div style='border: 1px solid #CBD5E0; padding: 20px; border-radius: 6px; background-color: #F7FAFC;'>
+                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>ABNORMAL FINDINGS</h3>
+                    <p style='color: #718096; font-size: 0.9rem; margin: 5px 0 0 0; text-align: center;'>Confidence: --%</p>
                 </div>
             """, unsafe_allow_html=True)
             
         st.markdown("""
             <div style='text-align: left; margin-top: 20px; padding: 15px; background-color: #EDF2F7; border-radius: 6px; font-size: 0.9rem;'>
-                💡 <b>AI Recommendation:</b> Micro-calcifications or mass density detected. Secondary classification required to determine pathological nature.
+                💡 <b>AI Recommendation:</b> Verification of inference layers. Secondary classification tracks can be populated dynamically post-execution.
             </div>
         """, unsafe_allow_html=True)
         
@@ -268,35 +268,35 @@ if menu_selection == "🔬 New AI Diagnostics":
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p4_next")
 
-    # الواجهة 5: تفصيل النتيجة وحفظ السجل
+    # الواجهة 5: تفصيل النتيجة (Benign / Malignant) - تم إلغاء تحديد الخيار الافتراضي وتوحيد التصميم
     elif st.session_state.page == 5:
         st.markdown("<h2 style='text-align: left;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
         st.write("")
         st.markdown("""
-            <div style='background-color: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
-                <span style='color: #9B2C2C; font-weight: bold;'>Initial Status: ABNORMAL DETECTED</span>
+            <div style='background-color: #EDF2F7; border: 1px solid #CBD5E0; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
+                <span style='color: #4A5568; font-weight: bold;'>Inference Status: Computing Secondary Probability Tracks</span>
             </div>
         """, unsafe_allow_html=True)
         
         col_b, col_m = st.columns(2)
         with col_b:
             st.markdown("""
-                <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC; opacity: 0.5;'>
+                <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC;'>
                     <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>BENIGN</h3>
-                    <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: 12.4%</p>
+                    <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
                 </div>
             """, unsafe_allow_html=True)
         with col_m:
             st.markdown("""
-                <div style='border: 2px solid #9B2C2C; padding: 25px; border-radius: 6px; background-color: #FFF5F5; box-shadow: 0 4px 10px rgba(155, 44, 44, 0.1);'>
-                    <h3 style='color: #9B2C2C !important; margin: 0; text-align: center;'>MALIGNANT</h3>
-                    <p style='color: #E53E3E; font-weight: bold; font-size: 1.1rem; margin-top: 5px; text-align: center;'>Probability: 87.6%</p>
+                <div style='border: 1px solid #CBD5E0; padding: 25px; border-radius: 6px; background-color: #F7FAFC;'>
+                    <h3 style='color: #4A5568 !important; margin: 0; text-align: center;'>MALIGNANT</h3>
+                    <p style='color: #718096; font-size: 0.85rem; margin-top: 5px; text-align: center;'>Probability: --%</p>
                 </div>
             """, unsafe_allow_html=True)
             
         st.markdown("""
             <div style='text-align: left; margin-top: 25px; border-left: 4px solid #1A365D; padding-left: 15px; font-size: 0.85rem; color: #4A5568;'>
-                <b>Engineering Titans System Note:</b> This evaluation is generated by an automated Deep Learning ensemble model. Results must be correlated clinically via histopathological biopsy before finalizing oncology reports.
+                <b>Engineering Titans System Note:</b> This evaluation module is optimized to hook into deep neural layer prediction logits. Resulting pipelines require correlation with expert histopathological analysis.
             </div>
         """, unsafe_allow_html=True)
         
@@ -310,18 +310,16 @@ if menu_selection == "🔬 New AI Diagnostics":
             st.button("Next", on_click=save_and_reset, key="btn_p5_next")
 
 # ==========================================
-# القسم الثاني: السجل الطبي للمرضى (الجدول المحدث بالفصل)
+# القسم الثاني: السجل الطبي للمرضى
 # ==========================================
 elif menu_selection == "📋 Patients Medical Log":
     st.markdown("<h2 style='text-align: left;'>📋 Patients Diagnostic Log Database</h2>", unsafe_allow_html=True)
     st.markdown("Review, search, and export historical diagnostic sessions saved on the system.")
     st.write("")
     
-    # فحص إذا كان الملف يحتوي على بيانات حقيقية وجديدة بفورمات الأعمدة المفصولة
     if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > 0:
         df_log = pd.read_csv(LOG_FILE)
         
-        # التأكد برمجياً من أن الملف يمتلك الأعمدة الجديدة لكي يعرضها بدون أخطاء
         if "Date" in df_log.columns:
             search_query = st.text_input("🔍 Search Database (By Name, Phone or Result):", "")
             
@@ -335,10 +333,7 @@ elif menu_selection == "📋 Patients Medical Log":
                 filtered_df = df_log
 
             filtered_df = filtered_df.iloc[::-1]
-            
-            # عرض الجدول المفصل التفاعلي
             st.dataframe(filtered_df, use_container_width=True, hide_index=True)
-            
             st.write("")
             
             col_dl, col_clr = st.columns([2, 1])
