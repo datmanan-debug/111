@@ -166,14 +166,12 @@ elif st.session_state.page == 2:
         st.button("Next", on_click=next_page)
 
 # ==========================================
-# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم تعديلها وحذف المربع
+# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم مسح سطر الـ Patient Record
 # ==========================================
 elif st.session_state.page == 3:
     st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
-    st.markdown(f"Patient Record: **{st.session_state.patient_name if st.session_state.patient_name else 'Anonymous'}**")
     st.write("")
     
-    # العناصر تظهر الآن مباشرة على خلفية الصفحة الشفافة بدون المربع الأبيض القديم
     st.markdown("<span class='ai-badge'>Supports standard .dcm / .dicom formats</span>", unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader("Upload Digital Mammography (DICOM File)", type=["dcm", "dicom"])
@@ -194,7 +192,6 @@ elif st.session_state.page == 3:
     st.write("")
     st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
     
-    # أزرار التنقل بالأسفل متناسقة تماماً
     col_back, col_next = st.columns([1, 1])
     with col_back:
         st.button("Back", on_click=prev_page)
@@ -202,11 +199,10 @@ elif st.session_state.page == 3:
         st.button("Run AI Diagnostics", on_click=next_page, disabled=not file_ready)
 
 # ==========================================
-# الواجهة 4: النتيجة الأولية (Normal / Abnormal)
+# الواجهة 4: النتيجة الأولية (Normal / Abnormal) - تم مسح سطر الـ Patient Record
 # ==========================================
 elif st.session_state.page == 4:
     st.subheader("🔬 AI Diagnostic Analysis Result")
-    st.markdown(f"Analysis for Patient: **{st.session_state.patient_name if st.session_state.patient_name else 'Anonymous'}**")
     
     st.markdown("<div class='custom-card' style='text-align: center;'>", unsafe_allow_html=True)
     st.markdown("<span class='ai-badge'>Classification Layer: Binary Screening</span>", unsafe_allow_html=True)
