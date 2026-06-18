@@ -36,7 +36,7 @@ st.markdown("""
         text-align: center;
     }
     
-    /* تنسيق الحاويات والمربعات لتظهر بشكل كلاسيكي هادئ */
+    /* تنسيق الحاويات والمربعات للواجهات الأخرى */
     .custom-card {
         background-color: #FFFFFF;
         padding: 30px;
@@ -51,7 +51,7 @@ st.markdown("""
         padding-top: 3rem !important;
     }
 
-    /* حاوية الفليكس لفرض التوسط المطلق على الزر وكل شيء داخلها */
+    /* حاوية الفليكس لفرض التوسط المطلق في الصفحة الأولى */
     .center-wrapper {
         display: flex;
         flex-direction: column;
@@ -61,16 +61,9 @@ st.markdown("""
         width: 100%;
     }
 
-    /* تنسيق مخصص لجعل زر الـ Next يظهر في المنتصف تماماً بعرض محدد ومظهر متناسق */
-    div.stButton {
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-    
+    /* تنسيق مخصص للأزرار */
     div.stButton > button {
-        width: 160px !important; /* عرض متناسق للزر في المنتصف */
+        width: 100% !important;
         background-color: #2B6CB0 !important;
         color: white !important;
         border-radius: 6px !important;
@@ -115,10 +108,8 @@ def prev_page(): st.session_state.page -= 1
 # ==========================================
 if st.session_state.page == 1:
     
-    # فتح حاوية التوسط المطلق لجميع العناصر الحالية والمستقبلية بالصفحة
     st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
     
-    # دمج النص والصورة في سطر واحد ممتد في المنتصف تماماً ومزج الخلفية (mix-blend-mode) لإخفاء أي خلفية بيضاء مدمجة بالصورة
     if img_data:
         logo_html = f"""
         <div style='display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;'>
@@ -131,49 +122,49 @@ if st.session_state.page == 1:
         
     st.markdown(logo_html, unsafe_allow_html=True)
     
-    # باقي النصوص الترحيبية
     st.title("Mammogram AI Diagnostics System")
     st.markdown("<p style='color: #4A5568; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
     
-    # الخط الفاصل تحت الكلام مباشرة
     st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
     
     st.write("")
     st.write("")
     
-    # زر الانتقال الموحد والمجبر على التوسط المطلق بالـ CSS
-    st.button("Next", on_click=next_page)
+    col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
+    with col_btn_mid:
+        st.button("Next", on_click=next_page)
     
-    # إغلاق حاوية التوسط
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # الواجهة 2: بيانات المريض الطبية (Patient Info)
 # ==========================================
 elif st.session_state.page == 2:
-    st.subheader("📋 Patient Registration & Demographics")
+    st.markdown("<h2 style='text-align: left;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
     st.markdown("Please enter the patient's records accurately to map with the DICOM metadata.")
+    st.write("")
     
-    with st.container():
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+    name = st.text_input("Patient Full Name", value=st.session_state.patient_name)
+    st.session_state.patient_name = name
+    
+    col_age, col_phone = st.columns(2)
+    with col_age:
+        # تم تغيير الحقل هنا إلى حقل نصي عادي بدون أزرار زائد وناقص
+        st.text_input("Patient Age", value="45")
+    with col_phone:
+        st.text_input("Contact Number")
         
-        name = st.text_input("Patient Full Name", value=st.session_state.patient_name)
-        st.session_state.patient_name = name
-        
-        col_age, col_phone = st.columns(2)
-        with col_age:
-            st.number_input("Patient Age", min_value=1, max_value=120, value=45)
-        with col_phone:
-            st.text_input("Contact Number")
-            
-        st.radio("Prior Medical History of Breast Pathology?", ["No", "Yes"])
-        st.markdown("</div>", unsafe_allow_html=True)
-        
+    st.radio("Prior Medical History of Breast Pathology?", ["No", "Yes"])
+    
+    st.write("")
+    st.write("")
+    st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
+    
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("← Back", on_click=prev_page)
+        st.button("Back", on_click=prev_page)
     with col_next:
-        st.button("Next: Upload DICOM →", on_click=next_page)
+        st.button("Next", on_click=next_page)
 
 # ==========================================
 # الواجهة 3: رفع ملف الـ DICOM (Upload File)
