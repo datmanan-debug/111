@@ -25,7 +25,7 @@ def get_image_base64(path):
 
 img_data = get_image_base64("m.jpg")
 
-# 2. إضافة حزمة CSS المخصصة
+# 2. إضافة حزمة CSS المخصصة للتحكم المطلق بمواقع وتجاور الأزرار
 st.markdown("""
     <style>
     /* تغيير الخلفية العامة إلى الخلفية العاجية الدافئة */
@@ -175,7 +175,7 @@ with st.sidebar:
 # ==========================================
 if menu_selection == "🔬 New AI Diagnostics":
 
-    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - تم توسيط العبارة تماماً بالداخل
+    # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen) - زر Next في المنتصف تماماً وبشكل مستقل
     if st.session_state.page == 1:
         st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
         if img_data:
@@ -190,20 +190,19 @@ if menu_selection == "🔬 New AI Diagnostics":
             
         st.markdown(logo_html, unsafe_allow_html=True)
         st.markdown("<h1>Mammogram AI Diagnostics System</h1>", unsafe_allow_html=True)
-        
-        # العبارة موضوعة هنا بداخل حاوية التوسط المطلق سنتر
         st.markdown("<p style='color: #2E4A62; font-size: 1.1rem; margin-top: -5px; text-align: center; width: 100%;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
         
         st.markdown("<hr style='border-top: 2px solid #D4A5B8; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
         st.write("")
         st.write("")
         
+        # تقسيم مخصص لجعل زر الـ Next في السنتر تماماً
         col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
         with col_btn_mid:
             st.button("Next", on_click=next_page, key="btn_p1_next")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # الواجهة 2: بيانات المريض الطبية (Patient Info)
+    # الواجهة 2: بيانات المريض الطبية (Patient Info) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 2:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>📋 Patient Registration & Demographics</h2>", unsafe_allow_html=True)
         st.markdown("Please enter the patient's records accurately to map with the DICOM metadata.")
@@ -220,16 +219,16 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.session_state.patient_history = st.radio("Prior Medical History of Breast Pathology?", ["No", "Yes"], index=0 if st.session_state.patient_history == "No" else 1)
         
         st.write("")
-        st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        col_back, col_next = st.columns([1, 1])
+        # أزرار متقاربة في منتصف الواجهة
+        col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p2_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p2_next")
 
-    # الواجهة 3: رفع ملف الـ DICOM (Upload File)
+    # الواجهة 3: رفع ملف الـ DICOM (Upload File) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 3:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
         st.write("")
@@ -250,13 +249,14 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        col_back, col_next = st.columns([1, 1])
+        # أزرار متقاربة في منتصف الواجهة
+        col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p3_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p3_next")
 
-    # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
+    # الواجهة 4: النتيجة الأولية (Normal / Abnormal) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 4:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>🔬 AI Diagnostic Analysis Result</h2>", unsafe_allow_html=True)
         st.write("")
@@ -285,13 +285,15 @@ if menu_selection == "🔬 New AI Diagnostics":
         
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
-        col_back, col_next = st.columns([1, 1])
+        
+        # أزرار متقاربة في منتصف الواجهة
+        col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p4_back")
         with col_next:
             st.button("Next", on_click=next_page, key="btn_p4_next")
 
-    # الواجهة 5: تفصيل النتيجة (Benign / Malignant)
+    # الواجهة 5: تفصيل النتيجة (Benign / Malignant) - أزرار متقاربة ومتوسطة الشاشة
     elif st.session_state.page == 5:
         st.markdown("<h2 style='text-align: left; color: #2E4A62;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
         st.write("")
@@ -326,7 +328,8 @@ if menu_selection == "🔬 New AI Diagnostics":
         st.write("")
         st.markdown("<hr style='border-top: 1px solid #D4A5B8; margin: 20px 0;'>", unsafe_allow_html=True)
         
-        col_back, col_next = st.columns([1, 1])
+        # أزرار متقاربة في منتصف الواجهة
+        col_l, col_back, col_next, col_r = st.columns([1.2, 1, 1, 1.2])
         with col_back:
             st.button("Back", on_click=prev_page, key="btn_p5_back")
         with col_next:
