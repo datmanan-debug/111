@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import os
+import base64
 
 # 1. إعدادات الصفحة الأساسية والثيم الرسمي
 st.set_page_config(
@@ -10,7 +11,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. إضافة حزمة CSS المخصصة للتصميم الرسمي الكلاسيكي
+# دالة لقراءة الصورة وتحويلها لـ Base64 لضمان عمل الـ CSS عليها بدقة
+def get_image_base64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    return ""
+
+img_data = get_image_base64("m.jpg")
+
+# 2. إضافة حزمة CSS المخصصة للتصميم الرسمي الكلاسيكي والتوسط المطلق
 st.markdown("""
     <style>
     /* تغيير الخلفية العامة إلى الرمادي البارد المريح */
@@ -36,10 +46,32 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* تنسيق أزرار التنقل لتكون رسمية وأنيقة */
-    .stButton>button {
+    /* تصفير الفراغات الافتراضية من ستريمليت لضمان السنتر الدقيق */
+    .block-container {
+        padding-top: 3rem !important;
+    }
+
+    /* حاوية الفليكس لفرض التوسط المطلق على الزر وكل شيء داخلها */
+    .center-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
         width: 100%;
-        background-color: #2B6CB0 !important; /* أزرق رسمي */
+    }
+
+    /* تنسيق مخصص لجعل زر الـ Next يظهر في المنتصف تماماً بعرض محدد ومظهر متناسق */
+    div.stButton {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    div.stButton > button {
+        width: 160px !important; /* عرض متناسق للزر في المنتصف */
+        background-color: #2B6CB0 !important;
         color: white !important;
         border-radius: 6px !important;
         padding: 10px 20px !important;
@@ -47,8 +79,8 @@ st.markdown("""
         font-weight: 600 !important;
         transition: all 0.3s ease;
     }
-    .stButton>button:hover {
-        background-color: #1A365D !important; /* أزرق أغمق عند التمرير */
+    div.stButton > button:hover {
+        background-color: #1A365D !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
@@ -82,36 +114,38 @@ def prev_page(): st.session_state.page -= 1
 # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
 # ==========================================
 if st.session_state.page == 1:
-    st.write("") # مسافات علوية لضبط المظهر
-    st.write("")
     
-    # محاذاة النص والصورة بجانب بعضهما في المنتصف بدون أي خلفية مقيدة
-    col_l, col_content, col_r = st.columns([1, 5, 1])
+    # فتح حاوية التوسط المطلق لجميع العناصر الحالية والمستقبلية بالصفحة
+    st.markdown("<div class='center-wrapper'>", unsafe_allow_html=True)
     
-    with col_content:
-        c1, c2 = st.columns([3, 1])
-        with c1:
-            st.markdown("<h2 style='color: #1A365D !important; font-size: 1.8rem; margin-top: 15px; letter-spacing: 2px; text-align: right;'>ENGINEERING TITANS</h2>", unsafe_allow_html=True)
-        with c2:
-            if os.path.exists("m.jpg"):
-                st.image("m.jpg", width=65)
-            else:
-                st.markdown("<span style='color:red; font-size:0.8rem;'>Missing m.jpg</span>", unsafe_allow_html=True)
+    # دمج النص والصورة في سطر واحد ممتد في المنتصف تماماً ومزج الخلفية (mix-blend-mode) لإخفاء أي خلفية بيضاء مدمجة بالصورة
+    if img_data:
+        logo_html = f"""
+        <div style='display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;'>
+            <h2 style='color: #1A365D !important; font-size: 2rem; margin: 0; letter-spacing: 2px;'>ENGINEERING TITANS</h2>
+            <img src='data:image/jpeg;base64,{img_data}' style='height: 60px; width: auto; object-fit: contain; mix-blend-mode: multiply;'>
+        </div>
+        """
+    else:
+        logo_html = "<h2 style='color: #1A365D !important; font-size: 2rem; margin-bottom: 20px; letter-spacing: 2px;'>ENGINEERING TITANS</h2>"
+        
+    st.markdown(logo_html, unsafe_allow_html=True)
     
-    # العناوين الرئيسية بالمنتصف
+    # باقي النصوص الترحيبية
     st.title("Mammogram AI Diagnostics System")
-    st.markdown("<p style='color: #4A5568; font-size: 1.1rem; text-align: center;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #4A5568; font-size: 1.1rem; margin-top: -10px;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
     
-    # الخط الفاصل تحت العبارة مباشرة
-    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 20px auto;'>", unsafe_allow_html=True)
+    # الخط الفاصل تحت الكلام مباشرة
+    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 60%; margin: 25px auto;'>", unsafe_allow_html=True)
     
     st.write("")
     st.write("")
     
-    # زر الانتقال (Next) في المنتصف تماماً
-    col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
-    with col_btn_mid:
-        st.button("Next", on_click=next_page)
+    # زر الانتقال الموحد والمجبر على التوسط المطلق بالـ CSS
+    st.button("Next", on_click=next_page)
+    
+    # إغلاق حاوية التوسط
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # الواجهة 2: بيانات المريض الطبية (Patient Info)
