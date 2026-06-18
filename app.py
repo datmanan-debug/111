@@ -89,9 +89,16 @@ if 'page' not in st.session_state:
 if 'patient_name' not in st.session_state:
     st.session_state.patient_name = ""
 
-# دالات المساعدة للتنقل
-def next_page(): st.session_state.page += 1
-def prev_page(): st.session_state.page -= 1
+# دالات المساعدة للتنقل وحل مشكلة القفز التلقائي
+def next_page(): 
+    st.session_state.page += 1
+
+def prev_page(): 
+    st.session_state.page -= 1
+
+def reset_system():
+    st.session_state.page = 1
+    st.session_state.patient_name = ""
 
 # ==========================================
 # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
@@ -122,7 +129,7 @@ if st.session_state.page == 1:
     
     col_btn_l, col_btn_mid, col_btn_r = st.columns([1.5, 1, 1.5])
     with col_btn_mid:
-        st.button("Next", on_click=next_page)
+        st.button("Next", on_click=next_page, key="btn_p1_next")
     
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -151,9 +158,9 @@ elif st.session_state.page == 2:
     
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("Back", on_click=prev_page)
+        st.button("Back", on_click=prev_page, key="btn_p2_back")
     with col_next:
-        st.button("Next", on_click=next_page)
+        st.button("Next", on_click=next_page, key="btn_p2_next")
 
 # ==========================================
 # الواجهة 3: رفع ملف الـ DICOM (Upload File)
@@ -182,9 +189,9 @@ elif st.session_state.page == 3:
     
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("Back", on_click=prev_page)
+        st.button("Back", on_click=prev_page, key="btn_p3_back")
     with col_next:
-        st.button("Next", on_click=next_page)
+        st.button("Next", on_click=next_page, key="btn_p3_next")
 
 # ==========================================
 # الواجهة 4: النتيجة الأولية (Normal / Abnormal)
@@ -222,18 +229,17 @@ elif st.session_state.page == 4:
     
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("Back", on_click=prev_page)
+        st.button("Back", on_click=prev_page, key="btn_p4_back")
     with col_next:
-        st.button("Next", on_click=next_page)
+        st.button("Next", on_click=next_page, key="btn_p4_next")
 
 # ==========================================
-# الواجهة 5: تفصيل النتيجة (Benign / Malignant) - تم تعديلها وحذف المربع والشارة وجعل الزر Next للعودة للصفحة الأولى
+# الواجهة 5: تفصيل النتيجة (Benign / Malignant)
 # ==========================================
 elif st.session_state.page == 5:
     st.markdown("<h2 style='text-align: left;'>🧬 Secondary Pathological Classification</h2>", unsafe_allow_html=True)
     st.write("")
     
-    # يظهر التنبيه والنتائج مباشرة بدون المربع الأبيض القديم
     st.markdown("""
         <div style='background-color: #FFF5F5; border: 1px solid #FEB2B2; padding: 12px; border-radius: 6px; margin-bottom: 25px; text-align: center;'>
             <span style='color: #9B2C2C; font-weight: bold;'>Initial Status: ABNORMAL DETECTED</span>
@@ -267,15 +273,12 @@ elif st.session_state.page == 5:
     st.write("")
     st.markdown("<hr style='border-top: 1px solid #E2E8F0; margin: 20px 0;'>", unsafe_allow_html=True)
     
-    # أزرار التحكم بالأسفل: Back و Next (الذي يصفر النظام ويعود للصفحة الترحيبية الأولى)
     col_back, col_next = st.columns([1, 1])
     with col_back:
-        st.button("Back", on_click=prev_page)
+        st.button("Back", on_click=prev_page, key="btn_p5_back")
     with col_next:
-        if st.button("Next"):
-            st.session_state.page = 1
-            st.session_state.patient_name = ""
-            st.rerun()
+        # ربط دالة التصفير مباشرة لحل مشكلة التنقل المفاجئ
+        st.button("Next", on_click=reset_system, key="btn_p5_next")
 
 # 4. تذييل الصفحة الرسمي الثابت (Footer)
 st.markdown("""
