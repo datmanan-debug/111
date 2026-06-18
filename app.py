@@ -64,15 +64,6 @@ st.markdown("""
         margin-bottom: 15px;
         border: 1px solid #BEE3F8;
     }
-
-    /* ملصق الشعار الخلفي الكحلي */
-    .sticker-container {
-        background-color: #1A365D;
-        padding: 12px 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(26, 54, 93, 0.2);
-        margin-bottom: 25px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -91,41 +82,37 @@ def prev_page(): st.session_state.page -= 1
 # الواجهة 1: الشاشة الترحيبية الرسمية (Splash Screen)
 # ==========================================
 if st.session_state.page == 1:
-    st.write("") # مساحة علوية
+    st.write("") # مسافات علوية لضبط المظهر
     st.write("")
     
-    # خدعة الأعمدة من ستريمليت لتوسيط الملصق (النص والصورة بجانبه) بنسبة 100%
-    col_left, col_sticker, col_right = st.columns([1, 4, 1])
+    # استخدام نظام الأعمدة لتوسيط الكلمة والصورة بجانب بعضهما تماماً بدون أي خلفيات مقيدة
+    col_l, col_content, col_r = st.columns([1, 5, 1])
     
-    with col_sticker:
-        # هنا دمجنا الـ HTML لعمل الخلفية الكحلية مع دوال ستريمليت الأصلية لعرض الصورة بضمان
-        st.markdown("<div class='sticker-container'>", unsafe_allow_html=True)
-        
-        # عمود للنص وعمود للصورة داخل الملصق
+    with col_content:
         c1, c2 = st.columns([3, 1])
         with c1:
-            st.markdown("<h2 style='color: white !important; font-size: 1.5rem; margin-top: 5px; letter-spacing: 2px; text-align: center;'>ENGINEERING TITANS</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='color: #1A365D !important; font-size: 1.8rem; margin-top: 15px; letter-spacing: 2px; text-align: right;'>ENGINEERING TITANS</h2>", unsafe_allow_html=True)
         with c2:
             if os.path.exists("m.jpg"):
-                st.image("m.jpg", width=45)
+                # تم تكبير الصورة وعرضها باستخدام دالة ستريمليت الأصلية لضمان ظهورها
+                st.image("m.jpg", width=65)
             else:
-                st.markdown("<span style='color:red;'>Missing m.jpg</span>", unsafe_allow_html=True)
-                
-        st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown("<span style='color:red; font-size:0.8rem;'>Missing m.jpg</span>", unsafe_allow_html=True)
     
-    # العناوين الرئيسية بالمنتصف تماماً
+    # العناوين الرئيسية بالمنتصف
     st.title("Mammogram AI Diagnostics System")
     st.markdown("<p style='color: #4A5568; font-size: 1.1rem; text-align: center;'>Integrating Engineering Precision with Medical Artificial Intelligence</p>", unsafe_allow_html=True)
-    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 30px auto;'>", unsafe_allow_html=True)
     
-    # مسافة إضافية لنزول زر الـ Next ليجوه
-    st.write("")
+    # الخط الفاصل أصبح هنا بالأسفل تحت العبارة مباشرة
+    st.markdown("<hr style='border-top: 1px solid #CBD5E0; width: 50%; margin: 20px auto;'>", unsafe_allow_html=True)
+    
     st.write("")
     st.write("")
     
-    col1, col2, col3 = st.columns([1, 1.5, 1])
+    # زر الانتقال في الأسفل باسم Next فقط
+    col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
-        st.button("Proceed to Clinical Portal", on_click=next_page)
+        st.button("Next", on_click=next_page)
 
 # ==========================================
 # الواجهة 2: بيانات المريض الطبية (Patient Info)
