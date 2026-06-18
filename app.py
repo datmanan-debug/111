@@ -115,18 +115,24 @@ def save_and_reset():
         "AI Diagnostics Result": "Malignant (87.6%)"
     }
     
-    # 2. تحويل السجل الحالي إلى DataFrame
     df_new = pd.DataFrame([new_record])
     
-    # 3. الحفظ المباشر في ملف الـ CSV
+    # 2. فحص الملف وإعادة تهيئته للتوافق مع الأعمدة المفصولة تلقائياً
     if os.path.exists(LOG_FILE):
-        df_old = pd.read_csv(LOG_FILE)
-        df_combined = pd.concat([df_old, df_new], ignore_index=True)
-        df_combined.to_csv(LOG_FILE, index=False)
+        try:
+            df_old = pd.read_csv(LOG_FILE)
+            # إذا كان الملف القديم يحتوي على العمود المدمج القديم، نقوم بحذفه لتهيئة الجديد
+            if "Date & Time" in df_old.columns:
+                df_new.to_csv(LOG_FILE, index=False)
+            else:
+                df_combined = pd.concat([df_old, df_new], ignore_index=True)
+                df_combined.to_csv(LOG_FILE, index=False)
+        except:
+            df_new.to_csv(LOG_FILE, index=False)
     else:
         df_new.to_csv(LOG_FILE, index=False)
         
-    # 4. تصفير المدخلات للعودة للحالة الأولى بنجاح
+    # 3. تصفير المدخلات للعودة للحالة الأولى بنجاح
     st.session_state.page = 1
     st.session_state.patient_name = ""
     st.session_state.patient_age = "45"
@@ -311,43 +317,47 @@ elif menu_selection == "📋 Patients Medical Log":
     st.markdown("Review, search, and export historical diagnostic sessions saved on the system.")
     st.write("")
     
+    # فحص إذا كان الملف يحتوي على بيانات حقيقية وجديدة بفورمات الأعمدة المفصولة
     if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > 0:
         df_log = pd.read_csv(LOG_FILE)
         
-        # شريط البحث
-        search_query = st.text_input("🔍 Search Database (By Name, Phone or Result):", "")
-        
-        if search_query:
-            filtered_df = df_log[
-                df_log['Patient Name'].astype(str).str.contains(search_query, case=False, na=False) |
-                df_log['Phone'].astype(str).str.contains(search_query, case=False, na=False) |
-                df_log['AI Diagnostics Result'].astype(str).str.contains(search_query, case=False, na=False)
-            ]
-        else:
-            filtered_df = df_log
+        # التأكد برمجياً من أن الملف يمتلك الأعمدة الجديدة لكي يعرضها بدون أخطاء
+        if "Date" in df_log.columns:
+            search_query = st.text_input("🔍 Search Database (By Name, Phone or Result):", "")
+            
+            if search_query:
+                filtered_df = df_log[
+                    df_log['Patient Name'].astype(str).str.contains(search_query, case=False, na=False) |
+                    df_log['Phone'].astype(str).str.contains(search_query, case=False, na=False) |
+                    df_log['AI Diagnostics Result'].astype(str).str.contains(search_query, case=False, na=False)
+                ]
+            else:
+                filtered_df = df_log
 
-        # قلب الجدول لعرض الأحدث دائماً في البداية
-        filtered_df = filtered_df.iloc[::-1]
-        
-        # عرض الجدول التفاعلي المفصل (Date و Time بشكل منفصل)
-        st.dataframe(filtered_df, use_container_width=True, hide_index=True)
-        
-        st.write("")
-        
-        col_dl, col_clr = st.columns([2, 1])
-        with col_dl:
-            csv_data = df_log.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="📥 Export Full Log to Excel (.CSV)",
-                data=csv_data,
-                file_name=f"Mammogram_AI_Log_{datetime.now().strftime('%Y%m%d')}.csv",
-                mime='text/csv'
-            )
-        with col_clr:
-            if st.button("🗑️ Clear Database"):
-                os.remove(LOG_FILE)
-                st.success("Database cleared successfully.")
-                st.rerun()
+            filtered_df = filtered_df.iloc[::-1]
+            
+            # عرض الجدول المفصل التفاعلي
+            st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+            
+            st.write("")
+            
+            col_dl, col_clr = st.columns([2, 1])
+            with col_dl:
+                csv_data = df_log.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="📥 Export Full Log to Excel (.CSV)",
+                    data=csv_data,
+                    file_name=f"Mammogram_AI_Log_{datetime.now().strftime('%Y%m%d')}.csv",
+                    mime='text/csv'
+                )
+            with col_clr:
+                if st.button("🗑️ Clear Database"):
+                    if os.path.exists(LOG_FILE):
+                        os.remove(LOG_FILE)
+                    st.success("Database cleared successfully.")
+                    st.rerun()
+        else:
+            st.info("The database structure has been updated. Complete a new AI Diagnostic session to populate the new log table.")
     else:
         st.info("No records found in the database. Complete an AI Diagnostic session to populate the log table.")
 
