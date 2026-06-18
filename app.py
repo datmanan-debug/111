@@ -166,7 +166,7 @@ elif st.session_state.page == 2:
         st.button("Next", on_click=next_page)
 
 # ==========================================
-# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم مسح سطر الـ Patient Record
+# الواجهة 3: رفع ملف الـ DICOM (Upload File) - تم جعل الزر Next
 # ==========================================
 elif st.session_state.page == 3:
     st.markdown("<h2 style='text-align: left;'>📂 Mammography File Ingestion</h2>", unsafe_allow_html=True)
@@ -196,10 +196,11 @@ elif st.session_state.page == 3:
     with col_back:
         st.button("Back", on_click=prev_page)
     with col_next:
-        st.button("Run AI Diagnostics", on_click=next_page, disabled=not file_ready)
+        # تم تعديل النص ليصبح "Next" فقط
+        st.button("Next", on_click=next_page, disabled=not file_ready)
 
 # ==========================================
-# الواجهة 4: النتيجة الأولية (Normal / Abnormal) - تم مسح سطر الـ Patient Record
+# الواجهة 4: النتيجة الأولية (Normal / Abnormal)
 # ==========================================
 elif st.session_state.page == 4:
     st.subheader("🔬 AI Diagnostic Analysis Result")
